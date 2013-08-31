@@ -17,18 +17,25 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class Resources {
-
+    public HashMap<String, ArrayList<String>> wordNetLemmaSenseMap = new HashMap<String,ArrayList<String>>();
+    public HashMap<String, ArrayList<String>> wordNetPredicateMap = new HashMap<String,ArrayList<String>>();
+    public HashMap<String, ArrayList<ArrayList<String>>> verbNetPredicateMap = new HashMap<String,ArrayList<ArrayList<String>>>();
     public HashMap<String, ArrayList<String>> synsetBaseconceptMap = new HashMap<String, ArrayList<String>>();
     public HashMap<String, ArrayList<String>> synsetOntologyMap = new HashMap<String, ArrayList<String>>();
     public HashMap<String, ArrayList<String>> ontologyOntologyMap = new HashMap<String, ArrayList<String>>();
     public ArrayList<String> relationArrayList = new ArrayList<String>();
 
     public Resources () {
+        wordNetLemmaSenseMap = new HashMap<String,ArrayList<String>>();
+        wordNetPredicateMap = new HashMap<String,ArrayList<String>>();
+        verbNetPredicateMap = new HashMap<String,ArrayList<ArrayList<String>>>();
         synsetBaseconceptMap = new HashMap<String, ArrayList<String>>();
         synsetOntologyMap = new HashMap<String, ArrayList<String>>();
         ontologyOntologyMap = new HashMap<String, ArrayList<String>>();
         relationArrayList = new ArrayList<String>();
     }
+
+
 
     public void extendExternalReference (ArrayList<String> coveredClasses, KafSense externalRef) {
         ArrayList<String> targets = ontologyOntologyMap.get(externalRef.getSensecode());
@@ -106,6 +113,164 @@ public class Resources {
                             ArrayList<String> targets = new ArrayList<String>();
                             targets.add(target);
                             map.put(source, targets);
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
+
+    public void processMatrixFileWithWordnetKey (String file) {
+        try {
+            /*
+            vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:02 vn:Agent fn:Expressing_publicly fn:NULL fn:Communicator pb:articulate.01 pb:0
+vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:02 vn:Topic fn:Expressing_publicly fn:NULL fn:Content pb:articulate.01 pb:1
+vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:02 vn:Recipient fn:Expressing_publicly fn:NULL fn:Addressee pb:articulate.01 pb:2
+vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:01 vn:Agent fn:Expressing_publicly fn:NULL fn:Communicator pb:articulate.01 pb:0
+vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:01 vn:Topic fn:Expressing_publicly fn:NULL fn:Content pb:articulate.01 pb:1
+vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:01 vn:Recipient fn:Expressing_publicly fn:NULL fn:Addressee pb:articulate.01 pb:2
+
+             */
+            //vn:comprehend-87.2 vn:87.2 vn:comprehend-87.2-1 vn:87.2-1 vn:apprehend wn:apprehend%2:31:00 vn:Experiencer fn:Grasp fn:NULL fn:NULL pb:NULL pb:NULL
+            //vn:comprehend-87.2 vn:87.2 vn:comprehend-87.2-1 vn:87.2-1 vn:apprehend wn:apprehend%2:31:00 vn:Attribute fn:Grasp fn:NULL fn:NULL pb:NULL pb:NULL
+            //vn:comprehend-87.2 vn:87.2 vn:comprehend-87.2-1 vn:87.2-1 vn:apprehend wn:apprehend%2:31:00 vn:Stimulus fn:Grasp fn:NULL fn:NULL pb:NULL pb:NULL
+
+            String [] headers = null;
+            FileInputStream fis = new FileInputStream(file);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader in = new BufferedReader(isr);
+            String inputLine = "";
+            String senseKey = "";
+            String lemma = "";
+            while (in.ready()&&(inputLine = in.readLine()) != null) {
+                if (inputLine.trim().length()>0) {
+/*                    if (inputLine.indexOf("wn:die%2:30:00")==-1) {
+                        continue;
+                    }*/
+                    String[] fields = inputLine.split(" ");
+                    //System.out.println("fields = " + fields);
+                    senseKey = "";
+                    lemma= "";
+                    if (fields.length>4) {
+                        //// takes wn sense key as the key
+                        senseKey = fields[5];
+                        lemma = senseKey.substring(3);
+                        int idx = lemma.indexOf("%");
+                        if (idx!=-1) {
+                            lemma = lemma.substring(0, idx);
+                        }
+                        if (wordNetLemmaSenseMap.containsKey(lemma)) {
+                            ArrayList<String> senseKeys = wordNetLemmaSenseMap.get(lemma);
+                            if (!senseKeys.contains(senseKey)) {
+                                senseKeys.add(senseKey);
+                                wordNetLemmaSenseMap.put(lemma, senseKeys);
+                            }
+                        }
+                        else {
+                            ArrayList<String> senseKeys =new ArrayList<String>();
+                            senseKeys.add(senseKey);
+                            wordNetLemmaSenseMap.put(lemma, senseKeys);
+                        }
+                        ArrayList<String> sourceFields = new ArrayList<String>();
+                        for (int i = 0; i < fields.length; i++) {
+                            String field = fields[i];
+                            if (field.toLowerCase().indexOf("null")==-1) {
+                                sourceFields.add(field);
+                            }
+                        }
+                        if (sourceFields.size()>0) {
+                            if (wordNetPredicateMap.containsKey(senseKey)) {
+                                ArrayList<String> targets = wordNetPredicateMap.get(senseKey);
+                                for (int i = 0; i < sourceFields.size(); i++) {
+                                    String s = sourceFields.get(i);
+                                    if (!targets.contains(s)) {
+                                        targets.add(s);
+                                    }
+                                }
+                                wordNetPredicateMap.put(senseKey, targets);
+                            }
+                            else {
+                                wordNetPredicateMap.put(senseKey, sourceFields);
+                            }
+                        }
+                    }
+                }
+            }
+/*            Set keySet = wordNetLemmaSenseMap.keySet();
+            Iterator keys = keySet.iterator();
+            while (keys.hasNext()) {
+                String key = (String) keys.next();
+                String str = key+"#";
+                ArrayList<String> sense = wordNetLemmaSenseMap.get(key);
+                for (int i = 0; i < sense.size(); i++) {
+                    String s = sense.get(i);
+                    str+=s+";";
+                }
+                System.out.println(str);
+
+            }*/
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
+
+    public void processMatrixFileWithVerbNetKey (String file) {
+        try {
+            /*
+            vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:02 vn:Agent fn:Expressing_publicly fn:NULL fn:Communicator pb:articulate.01 pb:0
+vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:02 vn:Topic fn:Expressing_publicly fn:NULL fn:Content pb:articulate.01 pb:1
+vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:02 vn:Recipient fn:Expressing_publicly fn:NULL fn:Addressee pb:articulate.01 pb:2
+vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:01 vn:Agent fn:Expressing_publicly fn:NULL fn:Communicator pb:articulate.01 pb:0
+vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:01 vn:Topic fn:Expressing_publicly fn:NULL fn:Content pb:articulate.01 pb:1
+vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:01 vn:Recipient fn:Expressing_publicly fn:NULL fn:Addressee pb:articulate.01 pb:2
+
+             */
+            //vn:comprehend-87.2 vn:87.2 vn:comprehend-87.2-1 vn:87.2-1 vn:apprehend wn:apprehend%2:31:00 vn:Experiencer fn:Grasp fn:NULL fn:NULL pb:NULL pb:NULL
+            //vn:comprehend-87.2 vn:87.2 vn:comprehend-87.2-1 vn:87.2-1 vn:apprehend wn:apprehend%2:31:00 vn:Attribute fn:Grasp fn:NULL fn:NULL pb:NULL pb:NULL
+            //vn:comprehend-87.2 vn:87.2 vn:comprehend-87.2-1 vn:87.2-1 vn:apprehend wn:apprehend%2:31:00 vn:Stimulus fn:Grasp fn:NULL fn:NULL pb:NULL pb:NULL
+
+            String [] headers = null;
+            FileInputStream fis = new FileInputStream(file);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader in = new BufferedReader(isr);
+            String inputLine = "";
+            String source = "";
+            while (in.ready()&&(inputLine = in.readLine()) != null) {
+                if (inputLine.trim().length()>0) {
+                    String[] fields = inputLine.split(" ");
+                    //System.out.println("fields = " + fields);
+                    source = "";
+                    if (fields.length>4) {
+//// Takes vn class lemma as the key
+
+                        source = fields[0].substring(3);
+                        int idx = source.lastIndexOf("-");
+                        if (idx>-1) {
+                            source = source.substring(0, idx);
+                        }
+
+                        //// takes wn sense key as the key
+                        source = fields[5];
+                        ArrayList<String> sourceFields = new ArrayList<String>();
+                        for (int i = 0; i < fields.length; i++) {
+                            String field = fields[i];
+                            if (field.toLowerCase().indexOf("null")==-1) {
+                                sourceFields.add(field);
+                            }
+                        }
+                        if (sourceFields.size()>0) {
+                            if (verbNetPredicateMap.containsKey(source)) {
+                                ArrayList<ArrayList<String>> targets = verbNetPredicateMap.get(source);
+                                targets.add(sourceFields);
+                                verbNetPredicateMap.put(source, targets);
+                            }
+                            else {
+                                ArrayList<ArrayList<String>> targets = new ArrayList<ArrayList<String>>();
+                                targets.add(sourceFields);
+                                verbNetPredicateMap.put(source, targets);
+                            }
                         }
                     }
                 }
