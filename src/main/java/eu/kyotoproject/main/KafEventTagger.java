@@ -32,14 +32,14 @@ public class KafEventTagger {
             }
             else if ((arg.equalsIgnoreCase("--predicate-matrix")) && (args.length>(i+1))) {
                 pathToMatrixFile = args[i+1];
-                resources.processMatrixFileWithWordnetKey(pathToMatrixFile);
+                resources.processMatrixFileWithWordnetSynset(pathToMatrixFile);
             }
             else if ((arg.equalsIgnoreCase("--version")) && (args.length>(i+1))) {
                 version = args[i+1];
             }
         }
         KafSaxParser kafSaxParser = new KafSaxParser();
-        processKafFileWordnetNet(kafSaxParser, pathToKafFile, resources, version, pos);
+        processKafFileWordnetNetSynsets(kafSaxParser, pathToKafFile, resources, version, pos);
         kafSaxParser.writeKafToStream(System.out);
     }
 
@@ -70,7 +70,7 @@ public class KafEventTagger {
         }
     }
 
-    static public void processKafFileWordnetNet (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources, String version, String pos) {
+    static public void processKafFileWordnetNetSenseKeys (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources, String version, String pos) {
         kafSaxParser.parseFile(pathToKafFile);
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
             KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
@@ -94,6 +94,47 @@ public class KafEventTagger {
                         }
                     }
                     kafTerm.addSenseTag(kafSense);
+                }
+
+            }
+        }
+    }
+
+    static public void processKafFileWordnetNetSynsets (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources, String version, String pos) {
+        kafSaxParser.parseFile(pathToKafFile);
+        for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
+            KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
+            if ((pos.isEmpty() || (kafTerm.getPos().toLowerCase().startsWith(pos))) &&
+                    (resources.wordNetLemmaSenseMap.containsKey(kafTerm.getLemma()))) {
+                ArrayList<String> senses = resources.wordNetLemmaSenseMap.get(kafTerm.getLemma());
+                for (int j = 0; j < senses.size(); j++) {
+                    String synsetId = senses.get(j);
+                    KafSense kafSense = new KafSense();
+                    kafSense.setResource(version);
+                    kafSense.setSensecode(synsetId);
+                    boolean matchingSense = false;
+                    for (int k = 0; k < kafTerm.getSenseTags().size(); k++) {
+                        KafSense givenKafSense = kafTerm.getSenseTags().get(k);
+                        if (givenKafSense.getSensecode().equals(synsetId)) {
+                           kafSense = givenKafSense;
+                           matchingSense = true;
+                           break;
+                        }
+                    }
+                    if (resources.wordNetPredicateMap.containsKey(synsetId)) {
+                        ArrayList<String> mapping = resources.wordNetPredicateMap.get(synsetId);
+                        for (int k = 1; k < mapping.size(); k++) {
+                            String s = mapping.get(k);
+                            String resource = s.substring(0, 2);
+                            KafSense child = new KafSense();
+                            child.setResource(resource);
+                            child.setSensecode(s);
+                            kafSense.addChildren(child);
+                        }
+                    }
+                    if (!matchingSense) {
+                        kafTerm.addSenseTag(kafSense);
+                    }
                 }
 
             }

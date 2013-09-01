@@ -38,7 +38,7 @@ public class KafEventTaggerFolder {
             }
             else if ((arg.equalsIgnoreCase("--predicate-matrix")) && (args.length>(i+1))) {
                 pathToMatrixFile = args[i+1];
-                resources.processMatrixFileWithWordnetKey(pathToMatrixFile);
+                resources.processMatrixFileWithWordnetSynset(pathToMatrixFile);
             }
             else if ((arg.equalsIgnoreCase("--version")) && (args.length>(i+1))) {
                 version = args[i+1];
@@ -49,7 +49,7 @@ public class KafEventTaggerFolder {
         for (int f = 0; f < kafFiles.size(); f++) {
             String pathToKafFile =  kafFiles.get(f);
             System.out.println("pathToKafFile = " + pathToKafFile);
-            KafEventTagger.processKafFileWordnetNet(kafSaxParser, pathToKafFile, resources, version, pos);
+            KafEventTagger.processKafFileWordnetNetSynsets(kafSaxParser, pathToKafFile, resources, version, pos);
             String pathToKafFileOut = pathToKafFile+".event.kaf";
             try {
                 FileOutputStream fos = new FileOutputStream(pathToKafFileOut);

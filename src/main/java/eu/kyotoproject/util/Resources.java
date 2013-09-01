@@ -122,7 +122,7 @@ public class Resources {
         }
     }
 
-    public void processMatrixFileWithWordnetKey (String file) {
+    public void processMatrixFileWithWordnetSenseKey (String file) {
         try {
             /*
             vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:02 vn:Agent fn:Expressing_publicly fn:NULL fn:Communicator pb:articulate.01 pb:0
@@ -216,9 +216,129 @@ vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:01 
         }
     }
 
+    String [] processMatrixFileVersion1IntoFields (String inputLine) {
+        String [] fields = null;
+        return fields;
+
+        //vn:appear-48.1.1 vn:48.1.1 vn:null vn:null vn:pop_up wn:NULL vn:NULL fn:NULL fn:NULL fn:NULL pb:NULL pb:NULL mcr:NULL mcr:NULL mcr:NULL mcr:NULL
+        //vn:appear-48.1.1 vn:48.1.1 vn:null vn:null vn:show_up wn:NULL vn:NULL fn:NULL fn:NULL fn:NULL pb:NULL pb:NULL mcr:NULL mcr:NULL mcr:NULL mcr:NULL
+        //vn:appear-48.1.1 vn:48.1.1 vn:null vn:null vn:spring up wn:NULL vn:NULL fn:NULL fn:NULL fn:NULL pb:NULL pb:NULL mcr:NULL mcr:NULL mcr:NULL
+        //vn:appear-48.1.1 vn:48.1.1 vn:null vn:null vn:take shape wn:NULL vn:NULL fn:NULL fn:NULL fn:NULL pb:NULL pb:NULL mcr:NULL mcr:NULL mcr:NULL
+    }
+
+    /**
+     * Stores lemma and synset key. Only works for matrix version 1
+     * @param file
+     */
+    public void processMatrixFileWithWordnetSynset (String file) {
+        try {
+           /*
+           VN_CLASS VN_CLASS_NUMBER VN_SUBCLASS VN_SUBCLASS_NUMBER VN_LEMA WN_SENSE VN_THEMROLE FN_FRAME FN_LEXENT FN_ROLE PB_ROLESET PB_ARG MCR_ILIOFFSET MCR_DOMAIN MCR_SUMO MC_LEXNAME
+vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misconstrue wn:misconstrue%2:31:01 vn:Experiencer fn:NULL fn:NULL fn:NULL pb:misconstrue.01 pb:0 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
+vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misconstrue wn:misconstrue%2:31:01 vn:Attribute fn:NULL fn:NULL fn:NULL pb:misconstrue.01 pb:1 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
+vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misconstrue wn:misconstrue%2:31:01 vn:Stimulus fn:NULL fn:NULL fn:NULL pb:misconstrue.01 pb:NULL mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
+vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:02 vn:Experiencer fn:NULL fn:NULL fn:NULL pb:misinterpret.01 pb:0 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
+vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:02 vn:Attribute fn:NULL fn:NULL fn:NULL pb:misinterpret.01 pb:2 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
+
+            */
+            String [] headers = null;
+            FileInputStream fis = new FileInputStream(file);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader in = new BufferedReader(isr);
+            String inputLine = "";
+            String synset = "";
+            String senseKey ="";
+            String lemma = "";
+            while (in.ready()&&(inputLine = in.readLine()) != null) {
+                if (inputLine.trim().length()>0) {
+/*                    if (inputLine.indexOf("wn:die%2:30:00")==-1) {
+                        continue;
+                    }*/
+                    String[] fields = inputLine.split(" ");
+                    //System.out.println("fields = " + fields);
+                    synset = "";
+                    lemma= "";
+                    if (fields.length>=15) {
+
+                        if (!fields[12].startsWith("mcr:")) {
+                           // System.out.println("Error processing inputLine = " + inputLine);
+                            continue;
+                        }
+                        //// takes wn sense key as the key
+                        synset = "eng"+fields[12].substring(7);  //mcr:ili-30-00619869-v
+                        senseKey = fields[5]; /// wn:misconstrue%2:31:01
+                        //System.out.println("senseKey = " + senseKey);
+                        lemma = senseKey.substring(3);
+                        int idx = lemma.indexOf("%");
+                        if (idx!=-1) {
+                            lemma = lemma.substring(0, idx);
+                        }
+                        if (wordNetLemmaSenseMap.containsKey(lemma)) {
+                            ArrayList<String> synsets = wordNetLemmaSenseMap.get(lemma);
+                            if (!synsets.contains(synset)) {
+                                synsets.add(synset);
+                                wordNetLemmaSenseMap.put(lemma, synsets);
+                            }
+                        }
+                        else {
+                            ArrayList<String> synsets =new ArrayList<String>();
+                            synsets.add(synset);
+                            wordNetLemmaSenseMap.put(lemma, synsets);
+                        }
+                        ArrayList<String> sourceFields = new ArrayList<String>();
+                        for (int i = 0; i < fields.length; i++) {
+                            String field = fields[i];
+                            if (field.toLowerCase().indexOf("null")==-1) {
+                                sourceFields.add(field);
+                            }
+                        }
+                        if (sourceFields.size()>0) {
+                            if (wordNetPredicateMap.containsKey(synset)) {
+                                ArrayList<String> targets = wordNetPredicateMap.get(synset);
+                                for (int i = 0; i < sourceFields.size(); i++) {
+                                    String s = sourceFields.get(i);
+                                    if (!targets.contains(s)) {
+                                        targets.add(s);
+                                    }
+                                }
+                                wordNetPredicateMap.put(synset, targets);
+                            }
+                            else {
+                                wordNetPredicateMap.put(synset, sourceFields);
+                            }
+                        }
+                    }
+                    else {/*
+                        System.out.println("Error in inputLine = " + inputLine);
+                        System.out.println("fields.length = " + fields.length);
+                        for (int i = 0; i < fields.length; i++) {
+                            String field = fields[i];
+                            System.out.println("field = " + field);
+                        }*/
+                    }
+                }
+            }
+/*            Set keySet = wordNetLemmaSenseMap.keySet();
+            Iterator keys = keySet.iterator();
+            while (keys.hasNext()) {
+                String key = (String) keys.next();
+                String str = key+"#";
+                ArrayList<String> sense = wordNetLemmaSenseMap.get(key);
+                for (int i = 0; i < sense.size(); i++) {
+                    String s = sense.get(i);
+                    str+=s+";";
+                }
+                System.out.println(str);
+
+            }*/
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
+
     public void processMatrixFileWithVerbNetKey (String file) {
         try {
-            /*
+            /* version0.1
             vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:02 vn:Agent fn:Expressing_publicly fn:NULL fn:Communicator pb:articulate.01 pb:0
 vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:02 vn:Topic fn:Expressing_publicly fn:NULL fn:Content pb:articulate.01 pb:1
 vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:02 vn:Recipient fn:Expressing_publicly fn:NULL fn:Addressee pb:articulate.01 pb:2
@@ -230,6 +350,16 @@ vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:01 
             //vn:comprehend-87.2 vn:87.2 vn:comprehend-87.2-1 vn:87.2-1 vn:apprehend wn:apprehend%2:31:00 vn:Experiencer fn:Grasp fn:NULL fn:NULL pb:NULL pb:NULL
             //vn:comprehend-87.2 vn:87.2 vn:comprehend-87.2-1 vn:87.2-1 vn:apprehend wn:apprehend%2:31:00 vn:Attribute fn:Grasp fn:NULL fn:NULL pb:NULL pb:NULL
             //vn:comprehend-87.2 vn:87.2 vn:comprehend-87.2-1 vn:87.2-1 vn:apprehend wn:apprehend%2:31:00 vn:Stimulus fn:Grasp fn:NULL fn:NULL pb:NULL pb:NULL
+
+            /*
+            VN_CLASS VN_CLASS_NUMBER VN_SUBCLASS VN_SUBCLASS_NUMBER VN_LEMA WN_SENSE VN_THEMROLE FN_FRAME FN_LEXENT FN_ROLE PB_ROLESET PB_ARG MCR_ILIOFFSET MCR_DOMAIN MCR_SUMO MC_LEXNAME
+vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misconstrue wn:misconstrue%2:31:01 vn:Experiencer fn:NULL fn:NULL fn:NULL pb:misconstrue.01 pb:0 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
+vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misconstrue wn:misconstrue%2:31:01 vn:Attribute fn:NULL fn:NULL fn:NULL pb:misconstrue.01 pb:1 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
+vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misconstrue wn:misconstrue%2:31:01 vn:Stimulus fn:NULL fn:NULL fn:NULL pb:misconstrue.01 pb:NULL mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
+vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:02 vn:Experiencer fn:NULL fn:NULL fn:NULL pb:misinterpret.01 pb:0 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
+vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:02 vn:Attribute fn:NULL fn:NULL fn:NULL pb:misinterpret.01 pb:2 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
+
+             */
 
             String [] headers = null;
             FileInputStream fis = new FileInputStream(file);
