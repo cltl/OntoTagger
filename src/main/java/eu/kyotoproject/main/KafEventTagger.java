@@ -48,6 +48,7 @@ public class KafEventTagger {
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
             KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
             if ((pos.isEmpty() || (kafTerm.getPos().toLowerCase().startsWith(pos))) &&
+                    !kafTerm.getLemma().isEmpty() &&
                     (resources.verbNetPredicateMap.containsKey(kafTerm.getLemma()))) {
                 ArrayList<ArrayList<String>> mappings = resources.verbNetPredicateMap.get(kafTerm.getLemma());
                 for (int j = 0; j < mappings.size(); j++) {
@@ -75,6 +76,7 @@ public class KafEventTagger {
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
             KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
             if ((pos.isEmpty() || (kafTerm.getPos().toLowerCase().startsWith(pos))) &&
+                    !kafTerm.getLemma().isEmpty() &&
                     (resources.wordNetLemmaSenseMap.containsKey(kafTerm.getLemma()))) {
                 ArrayList<String> senses = resources.wordNetLemmaSenseMap.get(kafTerm.getLemma());
                 for (int j = 0; j < senses.size(); j++) {
@@ -105,6 +107,7 @@ public class KafEventTagger {
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
             KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
             if ((pos.isEmpty() || (kafTerm.getPos().toLowerCase().startsWith(pos))) &&
+                    !kafTerm.getLemma().isEmpty() &&
                     (resources.wordNetLemmaSenseMap.containsKey(kafTerm.getLemma()))) {
                 ArrayList<String> senses = resources.wordNetLemmaSenseMap.get(kafTerm.getLemma());
                 for (int j = 0; j < senses.size(); j++) {

@@ -161,6 +161,9 @@ vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:01 
                         if (idx!=-1) {
                             lemma = lemma.substring(0, idx);
                         }
+                        if (lemma.isEmpty()) {
+                            continue;
+                        }
                         if (wordNetLemmaSenseMap.containsKey(lemma)) {
                             ArrayList<String> senseKeys = wordNetLemmaSenseMap.get(lemma);
                             if (!senseKeys.contains(senseKey)) {
@@ -273,6 +276,9 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
                         if (idx!=-1) {
                             lemma = lemma.substring(0, idx);
                         }
+                        if (lemma.isEmpty()) {
+                            continue;
+                        }
                         if (wordNetLemmaSenseMap.containsKey(lemma)) {
                             ArrayList<String> synsets = wordNetLemmaSenseMap.get(lemma);
                             if (!synsets.contains(synset)) {
@@ -383,6 +389,9 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
 
                         //// takes wn sense key as the key
                         source = fields[5];
+                        if (source.isEmpty()) {
+                            continue;
+                        }
                         ArrayList<String> sourceFields = new ArrayList<String>();
                         for (int i = 0; i < fields.length; i++) {
                             String field = fields[i];
