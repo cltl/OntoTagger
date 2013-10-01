@@ -20,7 +20,9 @@ public class KafEventTagger {
         Resources resources = new Resources();
         String pathToKafFile = "";
         String pathToMatrixFile = "";
+        String pathToGrammaticalVerbsFile = "";
         String version = "";
+        boolean ili = false;
         String pos = "";
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
@@ -32,14 +34,30 @@ public class KafEventTagger {
             }
             else if ((arg.equalsIgnoreCase("--predicate-matrix")) && (args.length>(i+1))) {
                 pathToMatrixFile = args[i+1];
-                resources.processMatrixFileWithWordnetSynset(pathToMatrixFile);
             }
+            else if ((arg.equalsIgnoreCase("--grammatical-words")) && (args.length>(i+1))) {
+                pathToGrammaticalVerbsFile = args[i+1];
+            }
+
             else if ((arg.equalsIgnoreCase("--version")) && (args.length>(i+1))) {
                 version = args[i+1];
             }
+            else if ((arg.equalsIgnoreCase("--ili"))) {
+                ili = true;
+            }
+        }
+        if (ili) {
+            resources.processMatrixFileWithWordnetILI(pathToMatrixFile);
+
+        }
+        else {
+            resources.processMatrixFileWithWordnetLemma(pathToMatrixFile);
+        }
+        if (!pathToGrammaticalVerbsFile.isEmpty()) {
+            resources.processGrammaticalWordsFile(pathToGrammaticalVerbsFile);
         }
         KafSaxParser kafSaxParser = new KafSaxParser();
-        processKafFileWordnetNetSynsets(kafSaxParser, pathToKafFile, resources, version, pos);
+        processKafFileWordnetNetSynsets(kafSaxParser, pathToKafFile, resources);
         kafSaxParser.writeKafToStream(System.out);
     }
 
@@ -102,7 +120,7 @@ public class KafEventTagger {
         }
     }
 
-    static public void processKafFileWordnetNetSynsets (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources, String version, String pos) {
+    static public void processKafFileWordnetNetLemmas (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources, String version, String pos) {
         kafSaxParser.parseFile(pathToKafFile);
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
             KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
@@ -140,6 +158,34 @@ public class KafEventTagger {
                     }
                 }
 
+            }
+        }
+    }
+
+    static public void processKafFileWordnetNetSynsets (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources) {
+        kafSaxParser.parseFile(pathToKafFile);
+        for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
+            KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
+            if (resources.grammaticalWords.contains(kafTerm.getLemma())) {
+                KafSense child = new KafSense();
+                child.setSensecode("grammatical");
+                kafTerm.addSenseTag(child);
+            }
+            else {
+                for (int j = 0; j < kafTerm.getSenseTags().size(); j++) {
+                    KafSense givenKafSense = kafTerm.getSenseTags().get(j);
+                    if (resources.wordNetPredicateMap.containsKey(givenKafSense.getSensecode())) {
+                        ArrayList<String> mapping = resources.wordNetPredicateMap.get(givenKafSense.getSensecode());
+                        for (int k = 1; k < mapping.size(); k++) {
+                            String s = mapping.get(k);
+                            String resource = s.substring(0, 2);
+                            KafSense child = new KafSense();
+                            child.setResource(resource);
+                            child.setSensecode(s);
+                            givenKafSense.addChildren(child);
+                        }
+                    }
+                }
             }
         }
     }

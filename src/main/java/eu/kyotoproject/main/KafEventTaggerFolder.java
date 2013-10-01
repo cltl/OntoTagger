@@ -24,8 +24,10 @@ public class KafEventTaggerFolder {
         String pathToKafFolder = "";
         String fileExtension = "";
         String pathToMatrixFile = "";
+        String pathToGrammaticalVerbsFile = "";
         String version = "";
         String pos = "";
+        boolean ili = false;
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if ((arg.equalsIgnoreCase("--input-folder")) && (args.length>(i+1))) {
@@ -39,18 +41,30 @@ public class KafEventTaggerFolder {
             }
             else if ((arg.equalsIgnoreCase("--predicate-matrix")) && (args.length>(i+1))) {
                 pathToMatrixFile = args[i+1];
-                resources.processMatrixFileWithWordnetSynset(pathToMatrixFile);
             }
-            else if ((arg.equalsIgnoreCase("--version")) && (args.length>(i+1))) {
-                version = args[i+1];
+            else if ((arg.equalsIgnoreCase("--grammatical-words")) && (args.length>(i+1))) {
+                pathToGrammaticalVerbsFile = args[i+1];
             }
+            else if ((arg.equalsIgnoreCase("--ili"))) {
+                ili = true;
+            }
+        }
+        if (ili) {
+            resources.processMatrixFileWithWordnetILI(pathToMatrixFile);
+
+        }
+        else {
+            resources.processMatrixFileWithWordnetLemma(pathToMatrixFile);
+        }
+        if (!pathToGrammaticalVerbsFile.isEmpty()) {
+            resources.processGrammaticalWordsFile(pathToGrammaticalVerbsFile);
         }
         KafSaxParser kafSaxParser = new KafSaxParser();
         ArrayList<String> kafFiles = Util.makeRecursiveFileListAll(pathToKafFolder, fileExtension);
         for (int f = 0; f < kafFiles.size(); f++) {
             String pathToKafFile =  kafFiles.get(f);
             System.out.println("pathToKafFile = " + pathToKafFile);
-            KafEventTagger.processKafFileWordnetNetSynsets(kafSaxParser, pathToKafFile, resources, version, pos);
+            KafEventTagger.processKafFileWordnetNetSynsets(kafSaxParser, pathToKafFile, resources);
             String pathToKafFileOut = pathToKafFile+".event.kaf";
             try {
                 FileOutputStream fos = new FileOutputStream(pathToKafFileOut);
