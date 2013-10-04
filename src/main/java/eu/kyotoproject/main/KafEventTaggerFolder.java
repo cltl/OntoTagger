@@ -25,7 +25,7 @@ public class KafEventTaggerFolder {
         String fileExtension = "";
         String pathToMatrixFile = "";
         String pathToGrammaticalVerbsFile = "";
-        String version = "";
+        String pmVersion = "";
         String pos = "";
         boolean ili = false;
         for (int i = 0; i < args.length; i++) {
@@ -41,6 +41,9 @@ public class KafEventTaggerFolder {
             }
             else if ((arg.equalsIgnoreCase("--predicate-matrix")) && (args.length>(i+1))) {
                 pathToMatrixFile = args[i+1];
+            }
+            else if ((arg.equalsIgnoreCase("--version")) && (args.length>(i+1))) {
+                pmVersion = args[i+1];
             }
             else if ((arg.equalsIgnoreCase("--grammatical-words")) && (args.length>(i+1))) {
                 pathToGrammaticalVerbsFile = args[i+1];
@@ -64,11 +67,11 @@ public class KafEventTaggerFolder {
         for (int f = 0; f < kafFiles.size(); f++) {
             String pathToKafFile =  kafFiles.get(f);
             System.out.println("pathToKafFile = " + pathToKafFile);
-            KafEventTagger.processKafFileWordnetNetSynsets(kafSaxParser, pathToKafFile, resources);
+            KafEventTagger.processKafFileWordnetNetSynsets(kafSaxParser, pathToKafFile, pmVersion, resources);
             String pathToKafFileOut = pathToKafFile+".event.kaf";
             try {
                 FileOutputStream fos = new FileOutputStream(pathToKafFileOut);
-                kafSaxParser.writeKafToStream(fos);
+                kafSaxParser.writeNafToStream(fos);
                 fos.close();
             } catch (IOException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.

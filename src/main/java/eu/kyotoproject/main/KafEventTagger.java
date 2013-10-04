@@ -5,7 +5,9 @@ import eu.kyotoproject.kaf.KafSense;
 import eu.kyotoproject.kaf.KafTerm;
 import eu.kyotoproject.util.Resources;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,12 +18,16 @@ import java.util.ArrayList;
  */
 public class KafEventTagger {
 
+    static final String layer = "terms";
+    static final String name = "vua-event-tagger";
+    static final String version = "1.0";
+
     static public void main (String[] args) {
         Resources resources = new Resources();
         String pathToKafFile = "";
         String pathToMatrixFile = "";
         String pathToGrammaticalVerbsFile = "";
-        String version = "";
+        String pmVersion = "";
         boolean ili = false;
         String pos = "";
         for (int i = 0; i < args.length; i++) {
@@ -40,7 +46,7 @@ public class KafEventTagger {
             }
 
             else if ((arg.equalsIgnoreCase("--version")) && (args.length>(i+1))) {
-                version = args[i+1];
+                pmVersion = args[i+1];
             }
             else if ((arg.equalsIgnoreCase("--ili"))) {
                 ili = true;
@@ -57,12 +63,22 @@ public class KafEventTagger {
             resources.processGrammaticalWordsFile(pathToGrammaticalVerbsFile);
         }
         KafSaxParser kafSaxParser = new KafSaxParser();
-        processKafFileWordnetNetSynsets(kafSaxParser, pathToKafFile, resources);
-        kafSaxParser.writeKafToStream(System.out);
+        processKafFileWordnetNetSynsets(kafSaxParser, pathToKafFile, pmVersion, resources);
+        kafSaxParser.writeNafToStream(System.out);
     }
 
-    static public void processKafFileVerbNet (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources, String version, String pos) {
+    static public void processKafFileVerbNet (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources, String pmVersion, String pos) {
         kafSaxParser.parseFile(pathToKafFile);
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(System.currentTimeMillis());
+        String strdate = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy-MM-dd HH:mm:ss");
+
+        if (date != null) {
+            strdate = sdf.format(date.getTime());
+        }
+
+        kafSaxParser.getKafMetaData().addLayer(layer, name, version, strdate);
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
             KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
             if ((pos.isEmpty() || (kafTerm.getPos().toLowerCase().startsWith(pos))) &&
@@ -72,7 +88,7 @@ public class KafEventTagger {
                 for (int j = 0; j < mappings.size(); j++) {
                     ArrayList<String> mapping = mappings.get(j);
                     KafSense kafSense = new KafSense();
-                    kafSense.setResource(version);
+                    kafSense.setResource(pmVersion);
                     kafSense.setSensecode(mapping.get(0));
                     for (int k = 1; k < mapping.size(); k++) {
                         String s = mapping.get(k);
@@ -89,8 +105,18 @@ public class KafEventTagger {
         }
     }
 
-    static public void processKafFileWordnetNetSenseKeys (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources, String version, String pos) {
+    static public void processKafFileWordnetNetSenseKeys (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources, String pmVersion, String pos) {
         kafSaxParser.parseFile(pathToKafFile);
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(System.currentTimeMillis());
+        String strdate = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        if (date != null) {
+            strdate = sdf.format(date.getTime());
+        }
+
+        kafSaxParser.getKafMetaData().addLayer(layer, name, version, strdate);
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
             KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
             if ((pos.isEmpty() || (kafTerm.getPos().toLowerCase().startsWith(pos))) &&
@@ -100,7 +126,7 @@ public class KafEventTagger {
                 for (int j = 0; j < senses.size(); j++) {
                     String senseKey = senses.get(j);
                     KafSense kafSense = new KafSense();
-                    kafSense.setResource(version);
+                    kafSense.setResource(pmVersion);
                     kafSense.setSensecode(senseKey);
                     if (resources.wordNetPredicateMap.containsKey(senseKey)) {
                         ArrayList<String> mapping = resources.wordNetPredicateMap.get(senseKey);
@@ -120,8 +146,18 @@ public class KafEventTagger {
         }
     }
 
-    static public void processKafFileWordnetNetLemmas (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources, String version, String pos) {
+    static public void processKafFileWordnetNetLemmas (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources, String pmVersion, String pos) {
         kafSaxParser.parseFile(pathToKafFile);
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(System.currentTimeMillis());
+        String strdate = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        if (date != null) {
+            strdate = sdf.format(date.getTime());
+        }
+
+        kafSaxParser.getKafMetaData().addLayer(layer, name, version, strdate);
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
             KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
             if ((pos.isEmpty() || (kafTerm.getPos().toLowerCase().startsWith(pos))) &&
@@ -131,7 +167,7 @@ public class KafEventTagger {
                 for (int j = 0; j < senses.size(); j++) {
                     String synsetId = senses.get(j);
                     KafSense kafSense = new KafSense();
-                    kafSense.setResource(version);
+                    kafSense.setResource(pmVersion);
                     kafSense.setSensecode(synsetId);
                     boolean matchingSense = false;
                     for (int k = 0; k < kafTerm.getSenseTags().size(); k++) {
@@ -162,8 +198,18 @@ public class KafEventTagger {
         }
     }
 
-    static public void processKafFileWordnetNetSynsets (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources) {
+    static public void processKafFileWordnetNetSynsets (KafSaxParser kafSaxParser, String pathToKafFile, String pmVersion, Resources resources) {
         kafSaxParser.parseFile(pathToKafFile);
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(System.currentTimeMillis());
+        String strdate = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        if (date != null) {
+            strdate = sdf.format(date.getTime());
+        }
+
+        kafSaxParser.getKafMetaData().addLayer(layer, name, version, strdate);
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
             KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
             if (resources.grammaticalWords.contains(kafTerm.getLemma())) {
@@ -178,9 +224,8 @@ public class KafEventTagger {
                         ArrayList<String> mapping = resources.wordNetPredicateMap.get(givenKafSense.getSensecode());
                         for (int k = 1; k < mapping.size(); k++) {
                             String s = mapping.get(k);
-                            String resource = s.substring(0, 2);
                             KafSense child = new KafSense();
-                            child.setResource(resource);
+                            child.setResource(pmVersion);
                             child.setSensecode(s);
                             givenKafSense.addChildren(child);
                         }

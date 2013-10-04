@@ -177,10 +177,13 @@ vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:01 
                     if (fields.length>4) {
                         //// takes wn sense key as the key
                         senseKey = fields[5];
-                        lemma = senseKey.substring(3);
-                        int idx = lemma.indexOf("%");
-                        if (idx!=-1) {
-                            lemma = lemma.substring(0, idx);
+                        lemma = senseKey;
+                        if (senseKey.length()>2) {
+                            lemma = senseKey.substring(3);
+                            int idx = lemma.indexOf("%");
+                            if (idx!=-1) {
+                                lemma = lemma.substring(0, idx);
+                            }
                         }
                         if (lemma.isEmpty()) {
                             continue;
