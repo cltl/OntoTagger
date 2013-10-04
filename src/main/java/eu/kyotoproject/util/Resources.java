@@ -470,8 +470,8 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
                 }
             }
 
-            System.out.println("nSynset = " + nSynset);
-            System.out.println("noSynset = " + noSynset);
+            //System.out.println("nSynset = " + nSynset);
+            //System.out.println("noSynset = " + noSynset);
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
