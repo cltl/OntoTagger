@@ -19,7 +19,7 @@ import java.util.Calendar;
 public class KafEventTagger {
 
     static final String layer = "terms";
-    static final String name = "vua-event-tagger";
+    static final String name = "vua-predicate-matrix-tagger";
     static final String version = "1.0";
 
     static public void main (String[] args) {
