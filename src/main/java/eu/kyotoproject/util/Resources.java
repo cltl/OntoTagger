@@ -20,7 +20,7 @@ import java.util.Vector;
 public class Resources {
     public Vector<String> grammaticalWords = new Vector<String>();
     public HashMap<String, ArrayList<String>> wordNetLemmaSenseMap = new HashMap<String,ArrayList<String>>();
-    public HashMap<String, ArrayList<String>> wordNetPredicateMap = new HashMap<String,ArrayList<String>>();
+    public HashMap<String, ArrayList<ArrayList<String>>> wordNetPredicateMap = new HashMap<String,ArrayList<ArrayList<String>>>();
     public HashMap<String, ArrayList<ArrayList<String>>> verbNetPredicateMap = new HashMap<String,ArrayList<ArrayList<String>>>();
     public HashMap<String, ArrayList<String>> synsetBaseconceptMap = new HashMap<String, ArrayList<String>>();
     public HashMap<String, ArrayList<String>> synsetOntologyMap = new HashMap<String, ArrayList<String>>();
@@ -29,7 +29,7 @@ public class Resources {
 
     public Resources () {
         wordNetLemmaSenseMap = new HashMap<String,ArrayList<String>>();
-        wordNetPredicateMap = new HashMap<String,ArrayList<String>>();
+        wordNetPredicateMap = new HashMap<String,ArrayList<ArrayList<String>>>();
         verbNetPredicateMap = new HashMap<String,ArrayList<ArrayList<String>>>();
         synsetBaseconceptMap = new HashMap<String, ArrayList<String>>();
         synsetOntologyMap = new HashMap<String, ArrayList<String>>();
@@ -209,17 +209,23 @@ vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:01 
                         }
                         if (sourceFields.size()>0) {
                             if (wordNetPredicateMap.containsKey(senseKey)) {
-                                ArrayList<String> targets = wordNetPredicateMap.get(senseKey);
-                                for (int i = 0; i < sourceFields.size(); i++) {
+                                ArrayList<ArrayList<String>> targets = wordNetPredicateMap.get(senseKey);
+                                if (!hasSourceField(targets, sourceFields)) {
+                                    targets.add(sourceFields);
+                                    wordNetPredicateMap.put(senseKey, targets);
+
+                                }/*                                for (int i = 0; i < sourceFields.size(); i++) {
                                     String s = sourceFields.get(i);
                                     if (!targets.contains(s)) {
                                         targets.add(s);
                                     }
-                                }
+                                }*/
                                 wordNetPredicateMap.put(senseKey, targets);
                             }
                             else {
-                                wordNetPredicateMap.put(senseKey, sourceFields);
+                                ArrayList<ArrayList<String>> targets = new ArrayList<ArrayList<String>>();
+                                targets.add(sourceFields);
+                                wordNetPredicateMap.put(senseKey, targets);
                             }
                         }
                     }
@@ -324,17 +330,23 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
                         }
                         if (sourceFields.size()>0) {
                             if (wordNetPredicateMap.containsKey(synset)) {
-                                ArrayList<String> targets = wordNetPredicateMap.get(synset);
-                                for (int i = 0; i < sourceFields.size(); i++) {
+                                ArrayList<ArrayList<String>> targets = wordNetPredicateMap.get(synset);
+                                if (!hasSourceField(targets, sourceFields)) {
+                                    targets.add(sourceFields);
+                                    wordNetPredicateMap.put(synset, targets);
+
+                                }/*                                for (int i = 0; i < sourceFields.size(); i++) {
                                     String s = sourceFields.get(i);
                                     if (!targets.contains(s)) {
                                         targets.add(s);
                                     }
-                                }
+                                }*/
                                 wordNetPredicateMap.put(synset, targets);
                             }
                             else {
-                                wordNetPredicateMap.put(synset, sourceFields);
+                                ArrayList<ArrayList<String>> targets = new ArrayList<ArrayList<String>>();
+                                targets.add(sourceFields);
+                                wordNetPredicateMap.put(synset, targets);
                             }
                         }
                     }
@@ -450,18 +462,24 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
                     if (sourceFields.size()>0) {
                         if (wordNetPredicateMap.containsKey(synset)) {
                             nSynset++;
-                            ArrayList<String> targets = wordNetPredicateMap.get(synset);
-                            for (int i = 0; i < sourceFields.size(); i++) {
+                            ArrayList<ArrayList<String>> targets = wordNetPredicateMap.get(synset);
+                            if (!hasSourceField(targets, sourceFields)) {
+                                targets.add(sourceFields);
+                                wordNetPredicateMap.put(synset, targets);
+
+                            }                           /* for (int i = 0; i < sourceFields.size(); i++) {
                                 String s = sourceFields.get(i);
                                 if (!targets.contains(s)) {
                                     targets.add(s);
                                 }
-                            }
+                            }*/
                             wordNetPredicateMap.put(synset, targets);
                         }
                         else {
                             nSynset++;
-                            wordNetPredicateMap.put(synset, sourceFields);
+                            ArrayList<ArrayList<String>> targets = new ArrayList<ArrayList<String>>();
+                            targets.add(sourceFields);
+                            wordNetPredicateMap.put(synset, targets);
                         }
                     }
                     else {
@@ -475,6 +493,110 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
+    }
+
+    public void processMatrixFile (String file, String key) {
+        try {
+           /*
+           VN_CLASS VN_CLASS_NUMBER VN_SUBCLASS VN_SUBCLASS_NUMBER VN_LEMA WN_SENSE VN_THEMROLE FN_FRAME FN_LEXENT FN_ROLE PB_ROLESET PB_ARG MCR_ILIOFFSET MCR_DOMAIN MCR_SUMO MC_LEXNAME
+vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misconstrue wn:misconstrue%2:31:01 vn:Experiencer fn:NULL fn:NULL fn:NULL pb:misconstrue.01 pb:0 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
+vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misconstrue wn:misconstrue%2:31:01 vn:Attribute fn:NULL fn:NULL fn:NULL pb:misconstrue.01 pb:1 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
+vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misconstrue wn:misconstrue%2:31:01 vn:Stimulus fn:NULL fn:NULL fn:NULL pb:misconstrue.01 pb:NULL mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
+vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:02 vn:Experiencer fn:NULL fn:NULL fn:NULL pb:misinterpret.01 pb:0 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
+vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:02 vn:Attribute fn:NULL fn:NULL fn:NULL pb:misinterpret.01 pb:2 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
+
+            */
+            String [] headers = null;
+            FileInputStream fis = new FileInputStream(file);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader in = new BufferedReader(isr);
+            String inputLine = "";
+            String synset = "";
+            String senseKey ="";
+            String lemma = "";
+            int nSynset = 0;
+            int noSynset = 0;
+            while (in.ready()&&(inputLine = in.readLine()) != null) {
+                if (inputLine.trim().length()>0) {
+                    String[] fields = inputLine.split(" ");
+                    synset = "";
+                    ///get synset identifier
+                    for (int i = 0; i < fields.length; i++) {
+                        String field = fields[i];
+                        if (field.startsWith(key)) {
+                            int idx = field.lastIndexOf(":");
+                            if (idx>-1) {
+                                synset = field.substring(idx+1);
+                            }
+                            else {
+                                synset = field.substring(key.length());
+                            }
+                           // System.out.println("synset = " + synset);
+                            if (synset.startsWith("ili")) {
+                                //// ili reference
+                                synset = "eng"+synset.substring(3);  //mcr:ili-30-00619869-v
+                            }
+                            break;
+                        }
+                    }
+
+                    if (synset.isEmpty()) {
+                        /// we could not find a synset reference
+                        noSynset++;
+                        continue;
+                    }
+
+                    ArrayList<String> sourceFields = new ArrayList<String>();
+                    for (int i = 0; i < fields.length; i++) {
+                        String field = fields[i];
+                        if (field.toLowerCase().indexOf("null")==-1) {
+                            if (!sourceFields.contains(field))  {
+                                sourceFields.add(field);
+                            }
+                        }
+                    }
+                    if (sourceFields.size()>0) {
+                        if (wordNetPredicateMap.containsKey(synset)) {
+                            nSynset++;
+                            ArrayList<ArrayList<String>> targets = wordNetPredicateMap.get(synset);
+                            if (!hasSourceField(targets, sourceFields)) {
+                                targets.add(sourceFields);
+                                wordNetPredicateMap.put(synset, targets);
+
+                            }
+                           /* for (int i = 0; i < sourceFields.size(); i++) {
+                                String s = sourceFields.get(i);
+                                if (!targets.contains(s)) {
+                                    targets.add(s);
+                                }
+                            }*/
+                        }
+                        else {
+                            nSynset++;
+                            ArrayList<ArrayList<String>> targets = new ArrayList<ArrayList<String>>();
+                            targets.add(sourceFields);
+                            wordNetPredicateMap.put(synset, targets);
+                        }
+                    }
+                    else {
+                        //System.out.println(synset+":"+sourceFields.size());
+                    }
+                }
+            }
+
+            //System.out.println("nSynset = " + nSynset);
+            //System.out.println("noSynset = " + noSynset);
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
+
+    boolean hasSourceField (ArrayList<ArrayList<String>> targets, ArrayList<String> sourceField) {
+        for (int i = 0; i < targets.size(); i++) {
+            ArrayList<String> strings = targets.get(i);
+            if (strings.containsAll(sourceField)) return true;
+        }
+        return false;
     }
 
     public void processMatrixFileWithVerbNetKey (String file) {
@@ -537,8 +659,11 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
                         if (sourceFields.size()>0) {
                             if (verbNetPredicateMap.containsKey(source)) {
                                 ArrayList<ArrayList<String>> targets = verbNetPredicateMap.get(source);
-                                targets.add(sourceFields);
-                                verbNetPredicateMap.put(source, targets);
+                                if (!hasSourceField(targets, sourceFields)) {
+                                    targets.add(sourceFields);
+                                    verbNetPredicateMap.put(source, targets);
+
+                                }
                             }
                             else {
                                 ArrayList<ArrayList<String>> targets = new ArrayList<ArrayList<String>>();

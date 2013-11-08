@@ -26,6 +26,7 @@ public class KafEventTaggerFolder {
         String pathToMatrixFile = "";
         String pathToGrammaticalVerbsFile = "";
         String pmVersion = "";
+        String key = "";
         String pos = "";
         boolean ili = false;
         for (int i = 0; i < args.length; i++) {
@@ -48,13 +49,18 @@ public class KafEventTaggerFolder {
             else if ((arg.equalsIgnoreCase("--grammatical-words")) && (args.length>(i+1))) {
                 pathToGrammaticalVerbsFile = args[i+1];
             }
+            else if ((arg.equalsIgnoreCase("--key")) && (args.length>(i+1))) {
+                key = args[i+1];
+            }
             else if ((arg.equalsIgnoreCase("--ili"))) {
                 ili = true;
             }
         }
         if (ili) {
             resources.processMatrixFileWithWordnetILI(pathToMatrixFile);
-
+        }
+        else if (!key.isEmpty()) {
+            resources.processMatrixFile(pathToMatrixFile, key);
         }
         else {
             resources.processMatrixFileWithWordnetLemma(pathToMatrixFile);
@@ -62,6 +68,8 @@ public class KafEventTaggerFolder {
         if (!pathToGrammaticalVerbsFile.isEmpty()) {
             resources.processGrammaticalWordsFile(pathToGrammaticalVerbsFile);
         }
+        System.out.println("resources.wordNetPredicateMap.size() = " + resources.wordNetPredicateMap.size());
+        System.out.println("resources.grammaticalWords.size() = " + resources.grammaticalWords.size());
         KafSaxParser kafSaxParser = new KafSaxParser();
         ArrayList<String> kafFiles = Util.makeRecursiveFileListAll(pathToKafFolder, fileExtension);
         for (int f = 0; f < kafFiles.size(); f++) {

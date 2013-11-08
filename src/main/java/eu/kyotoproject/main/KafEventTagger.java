@@ -30,6 +30,7 @@ public class KafEventTagger {
         String pmVersion = "";
         boolean ili = false;
         String pos = "";
+        String key = "";
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if ((arg.equalsIgnoreCase("--kaf-file")) && (args.length>(i+1))) {
@@ -48,13 +49,18 @@ public class KafEventTagger {
             else if ((arg.equalsIgnoreCase("--version")) && (args.length>(i+1))) {
                 pmVersion = args[i+1];
             }
+            else if ((arg.equalsIgnoreCase("--key")) && (args.length>(i+1))) {
+                pmVersion = args[i+1];
+            }
             else if ((arg.equalsIgnoreCase("--ili"))) {
                 ili = true;
             }
         }
         if (ili) {
             resources.processMatrixFileWithWordnetILI(pathToMatrixFile);
-
+        }
+        else if (!key.isEmpty()) {
+            resources.processMatrixFile(pathToMatrixFile, key);
         }
         else {
             resources.processMatrixFileWithWordnetLemma(pathToMatrixFile);
@@ -89,8 +95,8 @@ public class KafEventTagger {
                     ArrayList<String> mapping = mappings.get(j);
                     KafSense kafSense = new KafSense();
                     kafSense.setResource(pmVersion);
-                    kafSense.setSensecode(mapping.get(0));
-                    for (int k = 1; k < mapping.size(); k++) {
+                    kafSense.setSensecode(mapping.get(0));//// we assume that the first mapping represents the sensCode
+                    for (int k = 0; k < mapping.size(); k++) {
                         String s = mapping.get(k);
                         String resource = s.substring(0, 2);
                         KafSense child = new KafSense();
@@ -129,15 +135,21 @@ public class KafEventTagger {
                     kafSense.setResource(pmVersion);
                     kafSense.setSensecode(senseKey);
                     if (resources.wordNetPredicateMap.containsKey(senseKey)) {
-                        ArrayList<String> mapping = resources.wordNetPredicateMap.get(senseKey);
-                        for (int k = 1; k < mapping.size(); k++) {
-                            String s = mapping.get(k);
-                            String resource = s.substring(0, 2);
-                            KafSense child = new KafSense();
-                            child.setResource(resource);
-                            child.setSensecode(s);
-                            kafSense.addChildren(child);
+                        ArrayList<ArrayList<String>> mappings = resources.wordNetPredicateMap.get(senseKey);
+                        KafSense mChild = new KafSense ();
+                        for (int m = 0; m < mappings.size(); m++) {
+                            ArrayList<String> mapping =  mappings.get(m);
+                            for (int k = 1; k < mapping.size(); k++) {
+                                String s = mapping.get(k);
+                                String resource = s.substring(0, 2);
+                                KafSense child = new KafSense();
+                                child.setResource(resource);
+                                child.setSensecode(s);
+                                mChild.addChildren(child);
+                            }
                         }
+                        kafSense.addChildren(mChild);
+
                     }
                     kafTerm.addSenseTag(kafSense);
                 }
@@ -179,15 +191,20 @@ public class KafEventTagger {
                         }
                     }
                     if (resources.wordNetPredicateMap.containsKey(synsetId)) {
-                        ArrayList<String> mapping = resources.wordNetPredicateMap.get(synsetId);
-                        for (int k = 1; k < mapping.size(); k++) {
-                            String s = mapping.get(k);
-                            String resource = s.substring(0, 2);
-                            KafSense child = new KafSense();
-                            child.setResource(resource);
-                            child.setSensecode(s);
-                            kafSense.addChildren(child);
+                        ArrayList<ArrayList<String>> mappings = resources.wordNetPredicateMap.get(synsetId);
+                        KafSense mChild = new KafSense ();
+                        for (int m = 0; m < mappings.size(); m++) {
+                            ArrayList<String> mapping =  mappings.get(m);
+                            for (int k = 1; k < mapping.size(); k++) {
+                                String s = mapping.get(k);
+                                String resource = s.substring(0, 2);
+                                KafSense child = new KafSense();
+                                child.setResource(resource);
+                                child.setSensecode(s);
+                                mChild.addChildren(child);
+                            }
                         }
+                        kafSense.addChildren(mChild);
                     }
                     if (!matchingSense) {
                         kafTerm.addSenseTag(kafSense);
@@ -219,16 +236,35 @@ public class KafEventTagger {
             }
             else {
                 for (int j = 0; j < kafTerm.getSenseTags().size(); j++) {
+
                     KafSense givenKafSense = kafTerm.getSenseTags().get(j);
                     if (resources.wordNetPredicateMap.containsKey(givenKafSense.getSensecode())) {
-                        ArrayList<String> mapping = resources.wordNetPredicateMap.get(givenKafSense.getSensecode());
-                        for (int k = 1; k < mapping.size(); k++) {
-                            String s = mapping.get(k);
-                            KafSense child = new KafSense();
-                            child.setResource(pmVersion);
-                            child.setSensecode(s);
-                            givenKafSense.addChildren(child);
+/*                        if (kafTerm.getPos().toLowerCase().startsWith("n")) {
+                            System.out.println("Info for givenKafSense.getSensecode() = " + givenKafSense.getSensecode());
+                        }*/
+
+                        ArrayList<ArrayList<String>> mappings = resources.wordNetPredicateMap.get(givenKafSense.getSensecode());
+                        for (int m = 0; m < mappings.size(); m++) {
+                            KafSense mChild = new KafSense ();
+                            mChild.setResource("predicate-matrix");
+
+                            ArrayList<String> mapping =  mappings.get(m);
+                            for (int k = 1; k < mapping.size(); k++) {
+                                String s = mapping.get(k);
+                                String resource = s.substring(0, 2);
+                                KafSense child = new KafSense();
+                                child.setResource(resource);
+                                child.setSensecode(s);
+                                mChild.addChildren(child);
+                            }
+                            givenKafSense.addChildren(mChild);
                         }
+
+                    }
+                    else {
+/*                        if (kafTerm.getPos().toLowerCase().startsWith("n")) {
+                          System.out.println(givenKafSense.getSensecode());
+                        }*/
                     }
                 }
             }
