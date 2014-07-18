@@ -3,11 +3,10 @@ package eu.kyotoproject.main;
 import eu.kyotoproject.kaf.KafSaxParser;
 import eu.kyotoproject.kaf.KafSense;
 import eu.kyotoproject.kaf.KafTerm;
+import eu.kyotoproject.kaf.LP;
 import eu.kyotoproject.util.Resources;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 /**
  * Created with IntelliJ IDEA.
@@ -68,24 +67,22 @@ public class KafPredicateMatrixTagger {
         if (!pathToGrammaticalVerbsFile.isEmpty()) {
             resources.processGrammaticalWordsFile(pathToGrammaticalVerbsFile);
         }
+        String strBeginDate = eu.kyotoproject.util.DateUtil.createTimestamp();
+        String strEndDate = null;
+
         KafSaxParser kafSaxParser = new KafSaxParser();
         processKafFileWordnetNetSynsets(kafSaxParser, pathToKafFile, pmVersion, resources);
+
+        strEndDate = eu.kyotoproject.util.DateUtil.createTimestamp();
+        LP lp = new LP(name,version, strBeginDate, strBeginDate, strEndDate);
+        kafSaxParser.getKafMetaData().addLayer(name, lp);
+
         kafSaxParser.writeNafToStream(System.out);
     }
 
     static public void processKafFileVerbNet (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources, String pmVersion, String pos) {
         kafSaxParser.parseFile(pathToKafFile);
-        Calendar date = Calendar.getInstance();
-        date.setTimeInMillis(System.currentTimeMillis());
-        String strdate = null;
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy-MM-dd HH:mm:ss");
-
-        if (date != null) {
-            strdate = sdf.format(date.getTime());
-        }
-
-        kafSaxParser.getKafMetaData().addLayer(layer, name, version, strdate);
-        for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
+         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
             KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
             if ((pos.isEmpty() || (kafTerm.getPos().toLowerCase().startsWith(pos))) &&
                     !kafTerm.getLemma().isEmpty() &&
@@ -113,16 +110,6 @@ public class KafPredicateMatrixTagger {
 
     static public void processKafFileWordnetNetSenseKeys (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources, String pmVersion, String pos) {
         kafSaxParser.parseFile(pathToKafFile);
-        Calendar date = Calendar.getInstance();
-        date.setTimeInMillis(System.currentTimeMillis());
-        String strdate = null;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        if (date != null) {
-            strdate = sdf.format(date.getTime());
-        }
-
-        kafSaxParser.getKafMetaData().addLayer(layer, name, version, strdate);
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
             KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
             if ((pos.isEmpty() || (kafTerm.getPos().toLowerCase().startsWith(pos))) &&
@@ -160,16 +147,6 @@ public class KafPredicateMatrixTagger {
 
     static public void processKafFileWordnetNetLemmas (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources, String pmVersion, String pos) {
         kafSaxParser.parseFile(pathToKafFile);
-        Calendar date = Calendar.getInstance();
-        date.setTimeInMillis(System.currentTimeMillis());
-        String strdate = null;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        if (date != null) {
-            strdate = sdf.format(date.getTime());
-        }
-
-        kafSaxParser.getKafMetaData().addLayer(layer, name, version, strdate);
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
             KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
             if ((pos.isEmpty() || (kafTerm.getPos().toLowerCase().startsWith(pos))) &&
@@ -217,16 +194,6 @@ public class KafPredicateMatrixTagger {
 
     static public void processKafFileWordnetNetSynsets (KafSaxParser kafSaxParser, String pathToKafFile, String pmVersion, Resources resources) {
         kafSaxParser.parseFile(pathToKafFile);
-        Calendar date = Calendar.getInstance();
-        date.setTimeInMillis(System.currentTimeMillis());
-        String strdate = null;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        if (date != null) {
-            strdate = sdf.format(date.getTime());
-        }
-
-        kafSaxParser.getKafMetaData().addLayer(layer, name, version, strdate);
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
             KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
             if (resources.grammaticalWords.contains(kafTerm.getLemma())) {
