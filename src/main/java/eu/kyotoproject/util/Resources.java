@@ -524,6 +524,7 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
                     for (int i = 0; i < fields.length; i++) {
                         String field = fields[i];
                         if (field.startsWith(key)) {
+                           // System.out.println("field = " + field);
                             int idx = field.lastIndexOf(":");
                             if (idx>-1) {
                                 synset = field.substring(idx+1);

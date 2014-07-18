@@ -23,13 +23,13 @@ public class KafPredicateMatrixTagger {
 
     static public void main (String[] args) {
         Resources resources = new Resources();
-        String pathToKafFile = "";
-        String pathToMatrixFile = "";
-        String pathToGrammaticalVerbsFile = "";
-        String pmVersion = "";
+        String pathToKafFile = "/Tools/ontotagger-v1.0/naf-example/spinoza-voorbeeld-ukb.xml";
+        String pathToMatrixFile = "/Tools/ontotagger-v1.0/resources/PredicateMatrix.v1.1/PredicateMatrix.v1.1.nl.reduced";
+        String pathToGrammaticalVerbsFile = "/Tools/ontotagger-v1.0/resources/grammaticals/Grammatical-words.nl";
+        String pmVersion = "1.1";
         boolean ili = false;
         String pos = "";
-        String key = "";
+        String key = "odwn-eq";
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if ((arg.equalsIgnoreCase("--kaf-file")) && (args.length>(i+1))) {
@@ -225,7 +225,11 @@ public class KafPredicateMatrixTagger {
                             ArrayList<String> mapping =  mappings.get(m);
                             for (int k = 1; k < mapping.size(); k++) {
                                 String s = mapping.get(k);
-                                String resource = s.substring(0, 2);
+                                int idx = s.indexOf(":");
+                                String resource = "";
+                                if (idx>-1) {
+                                    resource = s.substring(0, idx);
+                                }
                                 KafSense child = new KafSense();
                                 child.setResource(resource);
                                 child.setSensecode(s);
