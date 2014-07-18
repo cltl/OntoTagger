@@ -1,7 +1,8 @@
 package eu.kyotoproject.util;
 
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created with IntelliJ IDEA.
@@ -38,5 +39,34 @@ public class Util {
             }
         }
         return acceptedFileList;
+    }
+
+    static public HashMap<String, ArrayList<String>> ReadFileToStringHashMap(String separator, String fileName) {
+        HashMap<String, ArrayList<String>> lineHashMap = new HashMap<String, ArrayList<String>>();
+        if (new File (fileName).exists() ) {
+            try {
+                FileInputStream fis = new FileInputStream(fileName);
+                InputStreamReader isr = new InputStreamReader(fis);
+                BufferedReader in = new BufferedReader(isr);
+                String inputLine;
+                while (in.ready()&&(inputLine = in.readLine()) != null) {
+                    //System.out.println(inputLine);
+                    if (inputLine.trim().length()>0) {
+                        String[] fields = inputLine.split(separator);
+                        String key = fields[0].trim();
+                        ArrayList<String> labels = new ArrayList<String>();
+                        for (int i = 1; i < fields.length; i++) {
+                            String field = fields[i].trim();
+                            labels.add(field);
+                        }
+                        lineHashMap.put(key, labels);
+                    }
+                }
+                in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return lineHashMap;
     }
 }
