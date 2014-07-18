@@ -72,11 +72,10 @@
 
     <dependencies>
         <dependency>
-            <groupId>eu.kyotoproject.kaf</groupId>
-            <artifactId>KyotoKafSaxParser</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
-        </dependency>
+        <groupId>KyotoKafSaxParser</groupId>
+        <artifactId>KyotoKafSaxParser</artifactId>
+        <version>1.0</version>
+    </dependency>
         <dependency>
             <groupId>org.jdom</groupId>
             <artifactId>jdom</artifactId>
