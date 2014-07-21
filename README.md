@@ -7,9 +7,9 @@ lemma or wordnet synset representations of text.
 Various functions are provided:
 
 1. tag terms with wordnet synsets with base concepts and/or ontology mappings
-2. the same as 1. for a whole folder of KAF files
-3. tag verb terms having synsets with SemLink mappings as they are stored in a predicate-matrix file
-4. the same as 3. but for a whole folder with KAF files.
+2. the same as 1. for a whole folder of KAF/NAF files
+3. tag verb terms having synsets with SemLink mappings as they are stored in a Predicate Matrix file
+4. the same as 3. but for a whole folder with KAF/NAF files.
 5. tag lemmas of terms with an RDF ontology with labels. Matches the term lemmas with the labels in RDF and inserts the RDF classification accordingly
 
 1. Tag a single KAF file with base concepts and ontology labels
@@ -35,6 +35,7 @@ parameters:
 --synset-ontology       [optional] <path to a text file with synset to ontology label mappings>
 --ontology-ontology     [optional] <path to the explicit ontology relations, assumes --synset-ontology>
 --relations             [optional] <path to a text file with the relations accepted>
+--format                <values "naf" or "kaf": indicate the format of the output>
 
 Format of the --synset-baseconcept file:
 syntax: synset-id+space+synset-id
@@ -135,6 +136,7 @@ parameters:
 --synset-ontology       [optional] <path to a text file with synset to ontology label mappings>
 --ontology-ontology     [optional] <path to the explicit ontology relations, assumes --synset-ontology>
 --relations             [optional] <path to a text file with the relations accepted>
+--format                <values "naf" or "kaf": indicate the format of the output>
 
 This function works the same as 1. except that the output is stored in a file withe the name of the input KAF with
 extended with ".onto.kaf".
@@ -142,14 +144,19 @@ extended with ".onto.kaf".
 
 3. Tag verbs in a KAF file with SemLink types
 
-Class:  eu.kyotoproject.main.KafEventTagger
+Class:  eu.kyotoproject.main.KafPredicateMatrixTagger
 
 Usage:
 parameters:
---kaf-file              <path to the kaf file>
---pos                   [optional] <part-of-speech of the term to be considered should start with the value of pos>
---predicate-matrix      <path to a text file with predicate-matrix>
---version               [optional] <version label of the predicate-matrix>
+--kaf-file or --naf-file <path to the n/kaf file>
+--pos                    [optional] <part-of-speech of the term to be considered should start with the value of pos>
+--predicate-matrix       <path to a text file with predicate-matrix>
+--version                [optional] <version label of the predicate-matrix>
+--key                    [optional] <prefix for the column from the predicate-matrix that holds the synset identifier
+--ili                    [optional] <if present, only ili-records are matched with the senses in the term layer>
+--format                 <values "naf" or "kaf": indicate the format of the output>
+--mappings               [optional] <string with the prefixes of the coolumns that should be added, each prefix separated by ";", e.g. "fn;mcr;vn">
+--grammatical-words      [optional] <file with stop words that should not be tagged>
 
 Output:
 
@@ -223,7 +230,7 @@ wn = WordNet
 
 4. Tag a folder with KAF files with base-concepts and ontology-labels
 
-Class:  eu.kyotoproject.main.KafEventTaggerFolder
+Class:  eu.kyotoproject.main.KafPredicateMatrixTaggerFolder
 
 Usage:
 parameters:
@@ -232,6 +239,12 @@ parameters:
 --pos                   [optional] <part-of-speech of the term to be considered should start with the value of pos>
 --predicate-matrix      <path to a text file with predicate-matrix>
 --version               [optional] <version label of the predicate-matrix>
+--key                    [optional] <prefix for the column from the predicate-matrix that holds the synset identifier
+--ili                    [optional] <if present, only ili-records are matched with the senses in the term layer>
+--format                 <values "naf" or "kaf": indicate the format of the output>
+--mappings               [optional] <string with the prefixes of the coolumns that should be added, each prefix separated by ";", e.g. "fn;mcr;vn">
+--grammatical-words      [optional] <file with stop words that should not be tagged>
+
 
 5. Tag lemmas in a KAF file with the classification in an RDF ontology
 
