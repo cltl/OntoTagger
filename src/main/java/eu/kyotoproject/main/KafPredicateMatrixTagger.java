@@ -20,6 +20,7 @@ public class KafPredicateMatrixTagger {
     static final String layer = "terms";
     static final String name = "vua-predicate-matrix-tagger";
     static final String version = "1.0";
+    static String[] selectedMappings = null;
 
     static public void main (String[] args) {
         Resources resources = new Resources();
@@ -33,6 +34,9 @@ public class KafPredicateMatrixTagger {
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if ((arg.equalsIgnoreCase("--kaf-file")) && (args.length>(i+1))) {
+                pathToKafFile = args[i+1];
+            }
+            else if ((arg.equalsIgnoreCase("--naf-file")) && (args.length>(i+1))) {
                 pathToKafFile = args[i+1];
             }
             else if ((arg.equalsIgnoreCase("--pos")) && (args.length>(i+1))) {
@@ -50,6 +54,9 @@ public class KafPredicateMatrixTagger {
             }
             else if ((arg.equalsIgnoreCase("--key")) && (args.length>(i+1))) {
                 pmVersion = args[i+1];
+            }
+            else if ((arg.equalsIgnoreCase("--mappings")) && (args.length>(i+1))) {
+                selectedMappings = args[i+1].split(";");
             }
             else if ((arg.equalsIgnoreCase("--ili"))) {
                 ili = true;
@@ -192,6 +199,16 @@ public class KafPredicateMatrixTagger {
         }
     }
 
+
+    static boolean checkMappings (String m) {
+        for (int l = 0; l < selectedMappings.length; l++) {
+            String selectedMapping = selectedMappings[l];
+            if (m.toLowerCase().startsWith(selectedMapping.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
     static public void processKafFileWordnetNetSynsets (KafSaxParser kafSaxParser, String pathToKafFile, String pmVersion, Resources resources) {
         kafSaxParser.parseFile(pathToKafFile);
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
@@ -225,15 +242,17 @@ public class KafPredicateMatrixTagger {
                             ArrayList<String> mapping =  mappings.get(m);
                             for (int k = 1; k < mapping.size(); k++) {
                                 String s = mapping.get(k);
-                                int idx = s.indexOf(":");
-                                String resource = "";
-                                if (idx>-1) {
-                                    resource = s.substring(0, idx);
+                                if (checkMappings(s)) {
+                                    int idx = s.indexOf(":");
+                                    String resource = "";
+                                    if (idx > -1) {
+                                        resource = s.substring(0, idx);
+                                    }
+                                    KafSense child = new KafSense();
+                                    child.setResource(resource);
+                                    child.setSensecode(s);
+                                    mChild.addChildren(child);
                                 }
-                                KafSense child = new KafSense();
-                                child.setResource(resource);
-                                child.setSensecode(s);
-                                mChild.addChildren(child);
                             }
                             givenKafSense.addChildren(mChild);
                         }
