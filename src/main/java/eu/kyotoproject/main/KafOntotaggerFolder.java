@@ -3,11 +3,13 @@ package eu.kyotoproject.main;
 import eu.kyotoproject.kaf.KafSaxParser;
 import eu.kyotoproject.kaf.KafSense;
 import eu.kyotoproject.kaf.KafTerm;
+import eu.kyotoproject.kaf.LP;
 import eu.kyotoproject.util.Resources;
 import eu.kyotoproject.util.Util;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 /**
@@ -19,6 +21,9 @@ import java.util.ArrayList;
  */
 public class KafOntotaggerFolder {
 
+    static final String layer = "terms";
+    static final String name = "vua-synset-ontotagger";
+    static final String version = "1.0";
 
     static public void main (String[] args) {
         Resources resources = new Resources();
@@ -28,6 +33,8 @@ public class KafOntotaggerFolder {
         String pathToSynsetBaseConceptFile = "";
         String pathToOntologyOntologyFile = "";
         String pathToRelationsFile = "";
+        String format = "naf";
+
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if ((arg.equalsIgnoreCase("--input-folder")) && (args.length>(i+1))) {
@@ -35,6 +42,9 @@ public class KafOntotaggerFolder {
             }
             else if ((arg.equalsIgnoreCase("--extension")) && (args.length>(i+1))) {
                 fileExtension = args[i+1];
+            }
+            else if ((arg.equalsIgnoreCase("--format")) && (args.length>(i+1))) {
+                format = args[i+1];
             }
             else if ((arg.equalsIgnoreCase("--synset-ontology")) && (args.length>(i+1))) {
                 pathToSynsetOntologyFile = args[i+1];
@@ -59,6 +69,9 @@ public class KafOntotaggerFolder {
         for (int f = 0; f < kafFiles.size(); f++) {
             String pathToKafFile =  kafFiles.get(f);
             System.out.println("pathToKafFile = " + pathToKafFile);
+            String strBeginDate = eu.kyotoproject.util.DateUtil.createTimestamp();
+            String strEndDate = null;
+
             kafSaxParser.parseFile(pathToKafFile);
             for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
                 KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
@@ -105,9 +118,18 @@ public class KafOntotaggerFolder {
                     }
                 }
             }
+
+            strEndDate = eu.kyotoproject.util.DateUtil.createTimestamp();
+            LP lp = new LP(name,version, strBeginDate, strBeginDate, strEndDate);
+            kafSaxParser.getKafMetaData().addLayer(name, lp);
             try {
-                FileOutputStream fos = new FileOutputStream(pathToKafFile+".ont.kaf");
-                kafSaxParser.writeKafToStream(fos);
+                OutputStream fos = new FileOutputStream(pathToKafFile+".ont.kaf");
+                if (format.equalsIgnoreCase("naf")) {
+                    kafSaxParser.writeNafToStream(fos);
+                }
+                else if (format.equalsIgnoreCase("kaf")) {
+                    kafSaxParser.writeKafToStream(fos);
+                }
                 fos.close();
             } catch (IOException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.

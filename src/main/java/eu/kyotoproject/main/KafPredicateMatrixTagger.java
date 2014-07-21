@@ -20,7 +20,6 @@ public class KafPredicateMatrixTagger {
     static final String layer = "terms";
     static final String name = "vua-predicate-matrix-tagger";
     static final String version = "1.0";
-    static String[] selectedMappings = null;
 
     static public void main (String[] args) {
         Resources resources = new Resources();
@@ -31,6 +30,8 @@ public class KafPredicateMatrixTagger {
         boolean ili = false;
         String pos = "";
         String key = "odwn-eq";
+        String format = "naf";
+        String[] selectedMappings = null;
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if ((arg.equalsIgnoreCase("--kaf-file")) && (args.length>(i+1))) {
@@ -78,16 +79,20 @@ public class KafPredicateMatrixTagger {
         String strEndDate = null;
 
         KafSaxParser kafSaxParser = new KafSaxParser();
-        processKafFileWordnetNetSynsets(kafSaxParser, pathToKafFile, pmVersion, resources);
+        processKafFileWordnetNetSynsets(kafSaxParser, pathToKafFile, pmVersion, resources, selectedMappings);
 
         strEndDate = eu.kyotoproject.util.DateUtil.createTimestamp();
         LP lp = new LP(name,version, strBeginDate, strBeginDate, strEndDate);
         kafSaxParser.getKafMetaData().addLayer(name, lp);
-
-        kafSaxParser.writeNafToStream(System.out);
+        if (format.equalsIgnoreCase("naf")) {
+            kafSaxParser.writeNafToStream(System.out);
+        }
+        else if (format.equalsIgnoreCase("kaf")) {
+            kafSaxParser.writeKafToStream(System.out);
+        }
     }
 
-    static public void processKafFileVerbNet (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources, String pmVersion, String pos) {
+    static public void processKafFileVerbNet (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources, String pmVersion, String pos, String [] selectedMappings) {
         kafSaxParser.parseFile(pathToKafFile);
          for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
             KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
@@ -102,11 +107,13 @@ public class KafPredicateMatrixTagger {
                     kafSense.setSensecode(mapping.get(0));//// we assume that the first mapping represents the sensCode
                     for (int k = 0; k < mapping.size(); k++) {
                         String s = mapping.get(k);
-                        String resource = s.substring(0, 2);
-                        KafSense child = new KafSense();
-                        child.setResource(resource);
-                        child.setSensecode(s);
-                        kafSense.addChildren(child);
+                        if (checkMappings(selectedMappings, s)) {
+                            String resource = s.substring(0, 2);
+                            KafSense child = new KafSense();
+                            child.setResource(resource);
+                            child.setSensecode(s);
+                            kafSense.addChildren(child);
+                        }
                     }
                     kafTerm.addSenseTag(kafSense);
                 }
@@ -115,7 +122,7 @@ public class KafPredicateMatrixTagger {
         }
     }
 
-    static public void processKafFileWordnetNetSenseKeys (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources, String pmVersion, String pos) {
+    static public void processKafFileWordnetNetSenseKeys (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources, String pmVersion, String pos, String[] selectedMappings) {
         kafSaxParser.parseFile(pathToKafFile);
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
             KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
@@ -135,11 +142,13 @@ public class KafPredicateMatrixTagger {
                             ArrayList<String> mapping =  mappings.get(m);
                             for (int k = 1; k < mapping.size(); k++) {
                                 String s = mapping.get(k);
-                                String resource = s.substring(0, 2);
-                                KafSense child = new KafSense();
-                                child.setResource(resource);
-                                child.setSensecode(s);
-                                mChild.addChildren(child);
+                                if (checkMappings(selectedMappings, s)) {
+                                    String resource = s.substring(0, 2);
+                                    KafSense child = new KafSense();
+                                    child.setResource(resource);
+                                    child.setSensecode(s);
+                                    mChild.addChildren(child);
+                                }
                             }
                         }
                         kafSense.addChildren(mChild);
@@ -152,7 +161,7 @@ public class KafPredicateMatrixTagger {
         }
     }
 
-    static public void processKafFileWordnetNetLemmas (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources, String pmVersion, String pos) {
+    static public void processKafFileWordnetNetLemmas (KafSaxParser kafSaxParser, String pathToKafFile, Resources resources, String pmVersion, String pos, String[] selectedMappings) {
         kafSaxParser.parseFile(pathToKafFile);
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
             KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
@@ -181,11 +190,13 @@ public class KafPredicateMatrixTagger {
                             ArrayList<String> mapping =  mappings.get(m);
                             for (int k = 1; k < mapping.size(); k++) {
                                 String s = mapping.get(k);
-                                String resource = s.substring(0, 2);
-                                KafSense child = new KafSense();
-                                child.setResource(resource);
-                                child.setSensecode(s);
-                                mChild.addChildren(child);
+                                if (checkMappings(selectedMappings, s)) {
+                                    String resource = s.substring(0, 2);
+                                    KafSense child = new KafSense();
+                                    child.setResource(resource);
+                                    child.setSensecode(s);
+                                    mChild.addChildren(child);
+                                }
                             }
                         }
                         kafSense.addChildren(mChild);
@@ -200,16 +211,20 @@ public class KafPredicateMatrixTagger {
     }
 
 
-    static boolean checkMappings (String m) {
-        for (int l = 0; l < selectedMappings.length; l++) {
-            String selectedMapping = selectedMappings[l];
+    static boolean checkMappings (String[] mappings, String m) {
+        if (mappings==null) {
+            return true;
+        }
+        for (int l = 0; l < mappings.length; l++) {
+            String selectedMapping = mappings[l];
             if (m.toLowerCase().startsWith(selectedMapping.toLowerCase())) {
                 return true;
             }
         }
         return false;
     }
-    static public void processKafFileWordnetNetSynsets (KafSaxParser kafSaxParser, String pathToKafFile, String pmVersion, Resources resources) {
+
+    static public void processKafFileWordnetNetSynsets (KafSaxParser kafSaxParser, String pathToKafFile, String pmVersion, Resources resources, String[] selectedMappings) {
         kafSaxParser.parseFile(pathToKafFile);
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
             KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
@@ -237,12 +252,11 @@ public class KafPredicateMatrixTagger {
                         ArrayList<ArrayList<String>> mappings = resources.wordNetPredicateMap.get(senseCode);
                         for (int m = 0; m < mappings.size(); m++) {
                             KafSense mChild = new KafSense ();
-                            mChild.setResource("predicate-matrix");
-
+                            mChild.setResource("predicate-matrix"+pmVersion);
                             ArrayList<String> mapping =  mappings.get(m);
                             for (int k = 1; k < mapping.size(); k++) {
                                 String s = mapping.get(k);
-                                if (checkMappings(s)) {
+                                if (checkMappings(selectedMappings, s)) {
                                     int idx = s.indexOf(":");
                                     String resource = "";
                                     if (idx > -1) {

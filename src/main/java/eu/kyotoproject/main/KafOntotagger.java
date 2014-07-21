@@ -3,6 +3,7 @@ package eu.kyotoproject.main;
 import eu.kyotoproject.kaf.KafSaxParser;
 import eu.kyotoproject.kaf.KafSense;
 import eu.kyotoproject.kaf.KafTerm;
+import eu.kyotoproject.kaf.LP;
 import eu.kyotoproject.util.Resources;
 
 import java.util.ArrayList;
@@ -15,6 +16,9 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class KafOntotagger {
+    static final String layer = "terms";
+    static final String name = "vua-synset-ontotagger";
+    static final String version = "1.0";
 
     static public void main (String[] args) {
         Resources resources = new Resources();
@@ -23,10 +27,18 @@ public class KafOntotagger {
         String pathToSynsetBaseConceptFile = "";
         String pathToOntologyOntologyFile = "";
         String pathToRelationsFile = "";
+        String format = "naf";
+
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if ((arg.equalsIgnoreCase("--kaf-file")) && (args.length>(i+1))) {
                 pathToKafFile = args[i+1];
+            }
+            else if ((arg.equalsIgnoreCase("--naf-file")) && (args.length>(i+1))) {
+                pathToKafFile = args[i+1];
+            }
+            else if ((arg.equalsIgnoreCase("--format")) && (args.length>(i+1))) {
+                format = args[i+1];
             }
             else if ((arg.equalsIgnoreCase("--synset-ontology")) && (args.length>(i+1))) {
                 pathToSynsetOntologyFile = args[i+1];
@@ -45,6 +57,9 @@ public class KafOntotagger {
                 resources.processRelationsFile(pathToRelationsFile);
             }
         }
+        String strBeginDate = eu.kyotoproject.util.DateUtil.createTimestamp();
+        String strEndDate = null;
+
         KafSaxParser kafSaxParser = new KafSaxParser();
         kafSaxParser.parseFile(pathToKafFile);
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
@@ -92,7 +107,15 @@ public class KafOntotagger {
                 }
             }
         }
-        kafSaxParser.writeKafToStream(System.out);
+        strEndDate = eu.kyotoproject.util.DateUtil.createTimestamp();
+        LP lp = new LP(name,version, strBeginDate, strBeginDate, strEndDate);
+        kafSaxParser.getKafMetaData().addLayer(name, lp);
+        if (format.equalsIgnoreCase("naf")) {
+            kafSaxParser.writeNafToStream(System.out);
+        }
+        else if (format.equalsIgnoreCase("kaf")) {
+            kafSaxParser.writeKafToStream(System.out);
+        }
     }
 
 

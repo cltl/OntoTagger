@@ -2,11 +2,13 @@ package eu.kyotoproject.main;
 
 
 import eu.kyotoproject.kaf.KafSaxParser;
+import eu.kyotoproject.kaf.LP;
 import eu.kyotoproject.util.Resources;
 import eu.kyotoproject.util.Util;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 /**
@@ -19,6 +21,10 @@ import java.util.ArrayList;
 public class KafPredicateMatrixTaggerFolder {
 
 
+    static final String layer = "terms";
+    static final String name = "vua-predicate-matrix-tagger";
+    static final String version = "1.0";
+
     static public void main (String[] args) {
         Resources resources = new Resources();
         String pathToKafFolder = "";
@@ -28,6 +34,9 @@ public class KafPredicateMatrixTaggerFolder {
         String pmVersion = "";
         String key = "";
         String pos = "";
+        String format = "naf";
+        String[] selectedMappings = null;
+
         boolean ili = false;
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
@@ -52,8 +61,14 @@ public class KafPredicateMatrixTaggerFolder {
             else if ((arg.equalsIgnoreCase("--key")) && (args.length>(i+1))) {
                 key = args[i+1];
             }
+            else if ((arg.equalsIgnoreCase("--format")) && (args.length>(i+1))) {
+                format = args[i+1];
+            }
             else if ((arg.equalsIgnoreCase("--ili"))) {
                 ili = true;
+            }
+            else if ((arg.equalsIgnoreCase("--mappings")) && (args.length>(i+1))) {
+                selectedMappings = args[i+1].split(";");
             }
         }
         if (ili) {
@@ -74,17 +89,33 @@ public class KafPredicateMatrixTaggerFolder {
         ArrayList<String> kafFiles = Util.makeRecursiveFileListAll(pathToKafFolder, fileExtension);
         for (int f = 0; f < kafFiles.size(); f++) {
             String pathToKafFile =  kafFiles.get(f);
-            System.out.println("pathToKafFile = " + pathToKafFile);
-            KafPredicateMatrixTagger.processKafFileWordnetNetSynsets(kafSaxParser, pathToKafFile, pmVersion, resources);
+           // System.out.println("pathToKafFile = " + pathToKafFile);
+
+            String strBeginDate = eu.kyotoproject.util.DateUtil.createTimestamp();
+            String strEndDate = null;
+
+            KafPredicateMatrixTagger.processKafFileWordnetNetSynsets(kafSaxParser, pathToKafFile, pmVersion, resources, selectedMappings);
+
+            strEndDate = eu.kyotoproject.util.DateUtil.createTimestamp();
+            LP lp = new LP(name,version, strBeginDate, strBeginDate, strEndDate);
+            kafSaxParser.getKafMetaData().addLayer(name, lp);
+
+
             String pathToKafFileOut = pathToKafFile+".event.kaf";
             try {
-                FileOutputStream fos = new FileOutputStream(pathToKafFileOut);
-                kafSaxParser.writeNafToStream(fos);
+                OutputStream fos = new FileOutputStream(pathToKafFileOut);
+                if (format.equalsIgnoreCase("naf")) {
+                    kafSaxParser.writeNafToStream(fos);
+                }
+                else if (format.equalsIgnoreCase("kaf")) {
+                    kafSaxParser.writeKafToStream(fos);
+                }
                 fos.close();
             } catch (IOException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
         }
+
 
     }
 
