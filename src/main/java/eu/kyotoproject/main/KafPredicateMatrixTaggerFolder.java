@@ -34,6 +34,7 @@ public class KafPredicateMatrixTaggerFolder {
         String pmVersion = "";
         String key = "";
         String pos = "";
+        String prefix = "";
         String format = "naf";
         String[] selectedMappings = null;
 
@@ -61,6 +62,9 @@ public class KafPredicateMatrixTaggerFolder {
             else if ((arg.equalsIgnoreCase("--key")) && (args.length>(i+1))) {
                 key = args[i+1];
             }
+            else if ((arg.equalsIgnoreCase("--ignore-prefix")) && (args.length>(i+1))) {
+                prefix = args[i+1];
+            }
             else if ((arg.equalsIgnoreCase("--format")) && (args.length>(i+1))) {
                 format = args[i+1];
             }
@@ -75,7 +79,7 @@ public class KafPredicateMatrixTaggerFolder {
             resources.processMatrixFileWithWordnetILI(pathToMatrixFile);
         }
         else if (!key.isEmpty()) {
-            resources.processMatrixFile(pathToMatrixFile, key);
+            resources.processMatrixFile(pathToMatrixFile, key, prefix);
         }
         else {
             resources.processMatrixFileWithWordnetLemma(pathToMatrixFile);

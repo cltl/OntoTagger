@@ -154,6 +154,7 @@ parameters:
 --version                [optional] <version label of the predicate-matrix>
 --key                    [optional] <prefix for the column from the predicate-matrix that holds the synset identifier
 --ili                    [optional] <if present, only ili-records are matched with the senses in the term layer>
+--ignore-prefix          [optional] <if synset identifiers in naf/kaf are NOT prefixed with 3-letter language code and version but the predicate matrix is, you can here specify the prefix for the predicate matrix to be ignore>
 --format                 <values "naf" or "kaf": indicate the format of the output>
 --mappings               [optional] <string with the prefixes of the coolumns that should be added, each prefix separated by ";", e.g. "fn;mcr;vn">
 --grammatical-words      [optional] <file with stop words that should not be tagged>

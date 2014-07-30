@@ -142,6 +142,7 @@ public class Resources {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
+    ///////// PREDICATE MATRIX FUNCTIONS //////////////////////////////
 
     public void processMatrixFileWithWordnetLemma(String file) {
         try {
@@ -249,7 +250,7 @@ vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:01 
         }
     }
 
-    String [] processMatrixFileVersion1IntoFields (String inputLine) {
+/*    String [] processMatrixFileVersion1IntoFields (String inputLine) {
         String [] fields = null;
         return fields;
 
@@ -259,13 +260,13 @@ vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:01 
         //vn:appear-48.1.1 vn:48.1.1 vn:null vn:null vn:take shape wn:NULL vn:NULL fn:NULL fn:NULL fn:NULL pb:NULL pb:NULL mcr:NULL mcr:NULL mcr:NULL
     }
 
-    /**
+    *//**
      * Stores lemma and synset key. Only works for matrix version 1
      * @param file
-     */
+     *//*
     public void processMatrixFileWithWordNetSynset (String file) {
         try {
-           /*
+           *//*
            VN_CLASS VN_CLASS_NUMBER VN_SUBCLASS VN_SUBCLASS_NUMBER VN_LEMA WN_SENSE VN_THEMROLE FN_FRAME FN_LEXENT FN_ROLE PB_ROLESET PB_ARG MCR_ILIOFFSET MCR_DOMAIN MCR_SUMO MC_LEXNAME
 vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misconstrue wn:misconstrue%2:31:01 vn:Experiencer fn:NULL fn:NULL fn:NULL pb:misconstrue.01 pb:0 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
 vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misconstrue wn:misconstrue%2:31:01 vn:Attribute fn:NULL fn:NULL fn:NULL pb:misconstrue.01 pb:1 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
@@ -273,7 +274,7 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misconstrue wn:misconstrue%2:31:01
 vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:02 vn:Experiencer fn:NULL fn:NULL fn:NULL pb:misinterpret.01 pb:0 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
 vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:02 vn:Attribute fn:NULL fn:NULL fn:NULL pb:misinterpret.01 pb:2 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
 
-            */
+            *//*
             String [] headers = null;
             FileInputStream fis = new FileInputStream(file);
             InputStreamReader isr = new InputStreamReader(fis);
@@ -284,9 +285,9 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
             String lemma = "";
             while (in.ready()&&(inputLine = in.readLine()) != null) {
                 if (inputLine.trim().length()>0) {
-/*                    if (inputLine.indexOf("wn:die%2:30:00")==-1) {
+*//*                    if (inputLine.indexOf("wn:die%2:30:00")==-1) {
                         continue;
-                    }*/
+                    }*//*
                     String[] fields = inputLine.split(" ");
                     //System.out.println("fields = " + fields);
                     synset = "";
@@ -335,12 +336,12 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
                                     targets.add(sourceFields);
                                     wordNetPredicateMap.put(synset, targets);
 
-                                }/*                                for (int i = 0; i < sourceFields.size(); i++) {
+                                }*//*                                for (int i = 0; i < sourceFields.size(); i++) {
                                     String s = sourceFields.get(i);
                                     if (!targets.contains(s)) {
                                         targets.add(s);
                                     }
-                                }*/
+                                }*//*
                                 wordNetPredicateMap.put(synset, targets);
                             }
                             else {
@@ -350,17 +351,17 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
                             }
                         }
                     }
-                    else {/*
+                    else {*//*
                         System.out.println("Error in inputLine = " + inputLine);
                         System.out.println("fields.length = " + fields.length);
                         for (int i = 0; i < fields.length; i++) {
                             String field = fields[i];
                             System.out.println("field = " + field);
-                        }*/
+                        }*//*
                     }
                 }
             }
-/*            Set keySet = wordNetLemmaSenseMap.keySet();
+*//*            Set keySet = wordNetLemmaSenseMap.keySet();
             Iterator keys = keySet.iterator();
             while (keys.hasNext()) {
                 String key = (String) keys.next();
@@ -372,11 +373,11 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
                 }
                 System.out.println(str);
 
-            }*/
+            }*//*
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-    }
+    }*/
 
     public void processMatrixFileWithWordnetILI (String file) {
         try {
@@ -495,7 +496,7 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
         }
     }
 
-    public void processMatrixFile (String file, String key) {
+    public void processMatrixFile (String file, String key, String prefix) {
         try {
            /*
            VN_CLASS VN_CLASS_NUMBER VN_SUBCLASS VN_SUBCLASS_NUMBER VN_LEMA WN_SENSE VN_THEMROLE FN_FRAME FN_LEXENT FN_ROLE PB_ROLESET PB_ARG MCR_ILIOFFSET MCR_DOMAIN MCR_SUMO MC_LEXNAME
@@ -506,14 +507,11 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
 vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:02 vn:Attribute fn:NULL fn:NULL fn:NULL pb:misinterpret.01 pb:2 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
 
             */
-            String [] headers = null;
             FileInputStream fis = new FileInputStream(file);
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader in = new BufferedReader(isr);
             String inputLine = "";
             String synset = "";
-            String senseKey ="";
-            String lemma = "";
             int nSynset = 0;
             int noSynset = 0;
             while (in.ready()&&(inputLine = in.readLine()) != null) {
@@ -524,18 +522,24 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
                     for (int i = 0; i < fields.length; i++) {
                         String field = fields[i];
                         if (field.startsWith(key)) {
-                           // System.out.println("field = " + field);
+                            // System.out.println("field = " + field);
                             int idx = field.lastIndexOf(":");
-                            if (idx>-1) {
-                                synset = field.substring(idx+1);
-                            }
-                            else {
+                            if (idx > -1) {
+                                synset = field.substring(idx + 1);
+                            } else {
                                 synset = field.substring(key.length());
                             }
-                           // System.out.println("synset = " + synset);
-                            if (synset.startsWith("ili")) {
-                                //// ili reference
-                                synset = "eng"+synset.substring(3);  //mcr:ili-30-00619869-v
+                            if (prefix.isEmpty())  {
+                                // System.out.println("synset = " + synset);
+                                if (synset.startsWith("ili")) {
+                                    //// ili reference
+                                    synset = "eng" + synset.substring(3);  //mcr:ili-30-00619869-v
+                                }
+                            }
+                            else {
+                               if (synset.startsWith(prefix)) {
+                                   synset = synset.substring(prefix.length());
+                               }
                             }
                             break;
                         }

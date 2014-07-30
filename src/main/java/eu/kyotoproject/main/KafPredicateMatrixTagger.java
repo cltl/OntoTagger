@@ -29,6 +29,7 @@ public class KafPredicateMatrixTagger {
         String pmVersion = "1.1";
         boolean ili = false;
         String pos = "";
+        String prefix = "";
         String key = "odwn-eq";
         String format = "naf";
         String[] selectedMappings = null;
@@ -56,6 +57,9 @@ public class KafPredicateMatrixTagger {
             else if ((arg.equalsIgnoreCase("--key")) && (args.length>(i+1))) {
                 pmVersion = args[i+1];
             }
+            else if ((arg.equalsIgnoreCase("--ignore-prefix")) && (args.length>(i+1))) {
+                prefix = args[i+1];
+            }
             else if ((arg.equalsIgnoreCase("--mappings")) && (args.length>(i+1))) {
                 selectedMappings = args[i+1].split(";");
             }
@@ -67,7 +71,7 @@ public class KafPredicateMatrixTagger {
             resources.processMatrixFileWithWordnetILI(pathToMatrixFile);
         }
         else if (!key.isEmpty()) {
-            resources.processMatrixFile(pathToMatrixFile, key);
+            resources.processMatrixFile(pathToMatrixFile, key, prefix);
         }
         else {
             resources.processMatrixFileWithWordnetLemma(pathToMatrixFile);
