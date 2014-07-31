@@ -1,9 +1,6 @@
 package eu.kyotoproject.main;
 
-import eu.kyotoproject.kaf.KafSaxParser;
-import eu.kyotoproject.kaf.KafSense;
-import eu.kyotoproject.kaf.KafTerm;
-import eu.kyotoproject.kaf.LP;
+import eu.kyotoproject.kaf.*;
 import eu.kyotoproject.util.Resources;
 
 import java.util.ArrayList;
@@ -23,8 +20,9 @@ public class KafPredicateMatrixTagger {
 
     static public void main (String[] args) {
         Resources resources = new Resources();
-        String pathToKafFile = "/Tools/ontotagger-v1.0/naf-example/spinoza-voorbeeld-ukb.xml";
-        String pathToMatrixFile = "/Tools/ontotagger-v1.0/resources/PredicateMatrix.v1.1/PredicateMatrix.v1.1.nl.reduced";
+      //  String pathToKafFile = "/Tools/ontotagger-v1.0/naf-example/spinoza-voorbeeld-ukb.xml";
+        String pathToKafFile = "/Users/piek/Desktop/NWR/NWR-SRL/wikinews-nl/files/14369_Airbus_offers_funding_to_search_for_black_boxes_from_Air_France_disaster.ukb.kaf";
+        String pathToMatrixFile = "/Tools/ontotagger-v1.0/resources/PredicateMatrix.v1.1/PredicateMatrix.v1.1.role.nl-1.merged";
         String pathToGrammaticalVerbsFile = "/Tools/ontotagger-v1.0/resources/grammaticals/Grammatical-words.nl";
         String pmVersion = "1.1";
         boolean ili = false;
@@ -239,50 +237,14 @@ public class KafPredicateMatrixTagger {
             }
             else {
                 for (int j = 0; j < kafTerm.getSenseTags().size(); j++) {
-
-                    KafSense givenKafSense = kafTerm.getSenseTags().get(j);
-                    String senseCode = givenKafSense.getSensecode();
-                    if (!resources.wordNetPredicateMap.containsKey(givenKafSense.getSensecode())) {
-                        if (senseCode.startsWith("nld-")) {
-                            int idx = senseCode.indexOf("_");
-                            if (idx>-1) {
-                                senseCode = senseCode.substring(idx-1);
-                            }
-                        }
-                    }
-                    if (resources.wordNetPredicateMap.containsKey(senseCode)) {
-
-
-                        ArrayList<ArrayList<String>> mappings = resources.wordNetPredicateMap.get(senseCode);
-                        for (int m = 0; m < mappings.size(); m++) {
-                            KafSense mChild = new KafSense ();
-                            mChild.setResource("predicate-matrix"+pmVersion);
-                            ArrayList<String> mapping =  mappings.get(m);
-                            for (int k = 1; k < mapping.size(); k++) {
-                                String s = mapping.get(k);
-                                if (checkMappings(selectedMappings, s)) {
-                                    int idx = s.indexOf(":");
-                                    String resource = "";
-                                    if (idx > -1) {
-                                        resource = s.substring(0, idx);
-                                    }
-                                    KafSense child = new KafSense();
-                                    child.setResource(resource);
-                                    child.setSensecode(s);
-                                    mChild.addChildren(child);
-                                }
-                            }
-                            givenKafSense.addChildren(mChild);
-                        }
-
-                    }
-                    else {
-                        if (kafTerm.getPos().toLowerCase().startsWith("n")) {
-                         // System.out.println(givenKafSense.getSensecode());
-                        }
-                        else {
-                          //  System.out.println(givenKafSense.getSensecode());
-                        }
+                    KafSense kafSense = kafTerm.getSenseTags().get(j);
+                    mappSense(resources, kafSense, pmVersion, selectedMappings);
+                }
+                for (int j = 0; j < kafTerm.getComponents().size(); j++) {
+                    TermComponent termComponent = kafTerm.getComponents().get(j);
+                    for (int k = 0; k < termComponent.getSenseTags().size(); k++) {
+                        KafSense kafSense = termComponent.getSenseTags().get(k);
+                        mappSense(resources, kafSense, pmVersion, selectedMappings);
                     }
                 }
             }
@@ -290,6 +252,46 @@ public class KafPredicateMatrixTagger {
     }
 
 
+    static void mappSense (Resources resources, KafSense givenKafSense, String pmVersion, String[] selectedMappings) {
+        String senseCode = givenKafSense.getSensecode();
+        if (!resources.wordNetPredicateMap.containsKey(givenKafSense.getSensecode())) {
+            if (senseCode.startsWith("nld-")) {
+                int idx = senseCode.indexOf("_"); //nld-21-d_v-3939-v
+                if (idx>-1) {
+                    senseCode = senseCode.substring(idx-1);  //d_v-3939-v
+                }
+            }
+        }
+        if (resources.wordNetPredicateMap.containsKey(senseCode)) {
 
+            ArrayList<ArrayList<String>> mappings = resources.wordNetPredicateMap.get(senseCode);
+            for (int m = 0; m < mappings.size(); m++) {
+                boolean match = false;
+                KafSense mChild = new KafSense ();
+                mChild.setResource("predicate-matrix"+pmVersion);
+                ArrayList<String> mapping =  mappings.get(m);
+                for (int k = 1; k < mapping.size(); k++) {
+                    String s = mapping.get(k);
+                    if (checkMappings(selectedMappings, s)) {
+                        match = true;
+                        int idx = s.indexOf(":");
+                        String resource = "";
+                        if (idx > -1) {
+                            resource = s.substring(0, idx);
+                        }
+                        KafSense child = new KafSense();
+                        child.setResource(resource);
+                        child.setSensecode(s);
+                        mChild.addChildren(child);
+                    }
+                }
+                if (match) {
+                  //  System.out.println("givenKafSense = " + givenKafSense.getSensecode());
+                    givenKafSense.addChildren(mChild);
+                }
+            }
+
+        }
+    }
 
 }
