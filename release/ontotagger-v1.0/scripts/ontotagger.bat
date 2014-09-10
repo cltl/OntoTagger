@@ -1,1 +1,0 @@
-java -cp ../lib/ontotagger-1.0-jar-with-dependencies.jar eu.kyotoproject.main.KafOntotagger --kaf-file ../example/vu_ukb_en.wsd.kaf --synset-ontology ../resources/version-1/Onto_classes_EN_part_verbalActions_corrected.txt.ontmp.txt > ../ontotag.kaf

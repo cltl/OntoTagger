@@ -21,7 +21,9 @@ public class KafPredicateMatrixTagger {
     static public void main (String[] args) {
         Resources resources = new Resources();
       //  String pathToKafFile = "/Tools/ontotagger-v1.0/naf-example/spinoza-voorbeeld-ukb.xml";
-        String pathToKafFile = "/Users/piek/Desktop/NWR/NWR-SRL/wikinews-nl/files/14369_Airbus_offers_funding_to_search_for_black_boxes_from_Air_France_disaster.ukb.kaf";
+       // String pathToKafFile = "/Users/piek/Desktop/NWR/NWR-SRL/wikinews-nl/files/14369_Airbus_offers_funding_to_search_for_black_boxes_from_Air_France_disaster.ukb.kaf";
+        String pathToKafFile = "/Tools/ontotagger-v1.0/naf-example/89007714_06.tok.alpino.ner.ukb.pm.ht.srl.naf";
+       // String pathToKafFile = "/Users/piek/Desktop/NWR/NWR-SRL/wikinews-nl/files/14369_Airbus_offers_funding_to_search_for_black_boxes_from_Air_France_disaster.ukb.kaf";
         String pathToMatrixFile = "/Tools/ontotagger-v1.0/resources/PredicateMatrix.v1.1/PredicateMatrix.v1.1.role.nl-1.merged";
         String pathToGrammaticalVerbsFile = "/Tools/ontotagger-v1.0/resources/grammaticals/Grammatical-words.nl";
         String pmVersion = "1.1";
@@ -88,6 +90,14 @@ public class KafPredicateMatrixTagger {
         kafSaxParser.getKafMetaData().addLayer(name, lp);
         if (format.equalsIgnoreCase("naf")) {
             kafSaxParser.writeNafToStream(System.out);
+            /*
+            try {
+                OutputStream fos = new FileOutputStream("/Tools/ontotagger-v1.0/naf-example/89007714_06.ont.srl.naf");
+                kafSaxParser.writeNafToStream(fos);
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }*/
         }
         else if (format.equalsIgnoreCase("kaf")) {
             kafSaxParser.writeKafToStream(System.out);
@@ -245,6 +255,7 @@ public class KafPredicateMatrixTagger {
                     for (int k = 0; k < termComponent.getSenseTags().size(); k++) {
                         KafSense kafSense = termComponent.getSenseTags().get(k);
                         mappSense(resources, kafSense, pmVersion, selectedMappings);
+
                     }
                 }
             }
