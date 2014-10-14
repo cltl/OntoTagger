@@ -121,7 +121,7 @@ public class KafOntotaggerFolder {
 
             strEndDate = eu.kyotoproject.util.DateUtil.createTimestamp();
             LP lp = new LP(name,version, strBeginDate, strBeginDate, strEndDate);
-            kafSaxParser.getKafMetaData().addLayer(name, lp);
+            kafSaxParser.getKafMetaData().addLayer(layer, lp);
             try {
                 OutputStream fos = new FileOutputStream(pathToKafFile+".ont.kaf");
                 if (format.equalsIgnoreCase("naf")) {

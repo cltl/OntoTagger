@@ -4,9 +4,6 @@ import eu.kyotoproject.kaf.*;
 import eu.kyotoproject.rdf.SenseFrameRoles;
 import eu.kyotoproject.util.GetDominantMapping;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -39,7 +36,8 @@ public class SrlFrameNetTagger {
         String fns = "fn:";
         String [] rnss = {"fn-role:", "pb-role:", "fn-pb-role:"};
         //String pathToKafFile = "/Tools/ontotagger-v1.0/naf-example/spinoza-voorbeeld-ukb.ont.xml";
-        String pathToKafFile = "/Tools/ontotagger-v1.0/naf-example/89007714_06.tok.alpino.ner.ukb.pm.ht.srl.naf";
+       // String pathToKafFile = "/Tools/ontotagger-v1.0/naf-example/89007714_06.tok.alpino.ner.ukb.pm.ht.srl.naf";
+        String pathToKafFile = "";
         Double confidenceThreshold = new Double(0.25);
         Integer frameThreshold = new Integer(70);
         String format = "naf";
@@ -80,20 +78,20 @@ public class SrlFrameNetTagger {
         String strEndDate = null;
 
         KafSaxParser kafSaxParser = new KafSaxParser();
-        processSrlLayer(kafSaxParser, pathToKafFile,fns, rnss, confidenceThreshold.doubleValue(), frameThreshold.intValue());
+        processSrlLayer(kafSaxParser, pathToKafFile, fns, rnss, confidenceThreshold.doubleValue(), frameThreshold.intValue());
 
         strEndDate = eu.kyotoproject.util.DateUtil.createTimestamp();
         LP lp = new LP(name,version, strBeginDate, strBeginDate, strEndDate);
-        kafSaxParser.getKafMetaData().addLayer(name, lp);
+        kafSaxParser.getKafMetaData().addLayer(layer, lp);
         if (format.equalsIgnoreCase("naf")) {
-           // kafSaxParser.writeNafToStream(System.out);
-            try {
+            kafSaxParser.writeNafToStream(System.out);
+/*            try {
                 OutputStream fos = new FileOutputStream("/Tools/ontotagger-v1.0/naf-example/89007714_06.ont.srl.naf");
                 kafSaxParser.writeNafToStream(fos);
                 fos.close();
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
         }
         else if (format.equalsIgnoreCase("kaf")) {
             kafSaxParser.writeKafToStream(System.out);
@@ -106,7 +104,12 @@ public class SrlFrameNetTagger {
                                         String [] rnss,
                                         double confidenceThreshold,
                                         int framethreshold) {
-        kafSaxParser.parseFile(pathToKafFile);
+        if (pathToKafFile.isEmpty()) {
+            kafSaxParser.parseFile(System.in);
+        }
+        else {
+            kafSaxParser.parseFile(pathToKafFile);
+        }
         for (int i = 0; i < kafSaxParser.getKafEventArrayList().size(); i++) {
             KafEvent event = kafSaxParser.getKafEventArrayList().get(i);
             for (int j = 0; j < event.getSpanIds().size(); j++) {
@@ -114,7 +117,7 @@ public class SrlFrameNetTagger {
                 KafTerm kafTerm = kafSaxParser.getTerm(termId);
                 if (kafTerm!=null) {
                     HashMap<String, ArrayList<SenseFrameRoles>> frameMap = GetDominantMapping.getFrameMap(kafTerm, confidenceThreshold, fns, rnss);
-                    if (frameMap.size()>0) System.out.println("frameMap.size() = " + frameMap.size());
+                   // if (frameMap.size()>0) System.out.println("frameMap.size() = " + frameMap.size());
                     double topscore = GetDominantMapping.getTopScore(frameMap);
                     Set keySet = frameMap.keySet();
                     Iterator<String> keys = keySet.iterator();

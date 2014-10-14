@@ -102,7 +102,7 @@ public class KafPredicateMatrixTaggerFolder {
 
             strEndDate = eu.kyotoproject.util.DateUtil.createTimestamp();
             LP lp = new LP(name,version, strBeginDate, strBeginDate, strEndDate);
-            kafSaxParser.getKafMetaData().addLayer(name, lp);
+            kafSaxParser.getKafMetaData().addLayer(layer, lp);
 
 
             String pathToKafFileOut = pathToKafFile+".event.kaf";
