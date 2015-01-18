@@ -23,11 +23,14 @@ public class SenseFrameRoles {
      */
 
     private double confidence;
+    private String ili;
     private String sense;
     private String resource;
     private String frame;
     private String frameNetLexicalUnit;
     private String propBankLexicalUnit;
+    private ArrayList<String> esoClasses;
+    private ArrayList<String> esoRoles;
     private ArrayList<String> fnRoles;
     private ArrayList<String> pbRoles;
     private ArrayList<String> fnpbRoles;
@@ -36,16 +39,26 @@ public class SenseFrameRoles {
     public SenseFrameRoles() {
         this.confidence = 0;
         this.resource = "";
+        this.ili = "";
         this.sense = "";
         this.frame = "";
         this.frameNetLexicalUnit = "";
         this.propBankLexicalUnit = "";
+        this.esoClasses = new ArrayList<String>();
+        this.esoRoles = new ArrayList<String>();
         this.fnRoles = new ArrayList<String>();
         this.pbRoles = new ArrayList<String>();
         this.fnpbRoles = new ArrayList<String>();
         this.roles = new ArrayList<String>();
     }
 
+    public String getIli() {
+        return ili;
+    }
+
+    public void setIli(String ili) {
+        this.ili = ili;
+    }
 
     public String getResource() {
         return resource;
@@ -141,6 +154,32 @@ public class SenseFrameRoles {
 
     public void addRoles(String role) {
         this.roles.add(role);
+    }
+    public void addEsoRoles(String role) {
+        if (!this.esoRoles.contains(role)) {
+            this.esoRoles.add(role);
+        }
+    }
+    public void addEsoClasses(String eso) {
+        if (!this.esoClasses.contains(eso)) {
+            this.esoClasses.add(eso);
+        }
+    }
+
+    public ArrayList<String> getEsoClasses() {
+        return esoClasses;
+    }
+
+    public void setEsoClasses(ArrayList<String> esoClasses) {
+        this.esoClasses = esoClasses;
+    }
+
+    public ArrayList<String> getEsoRoles() {
+        return esoRoles;
+    }
+
+    public void setEsoRoles(ArrayList<String> esoRoles) {
+        this.esoRoles = esoRoles;
     }
 
     public String toString () {

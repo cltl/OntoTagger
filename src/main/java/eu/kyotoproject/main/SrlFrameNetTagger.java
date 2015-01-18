@@ -35,14 +35,25 @@ public class SrlFrameNetTagger {
     static final String version = "1.0";
 
     static public void main (String[] args) {
-        String fns = "fn:";
-        String [] rnss = {"fn-role:", "pb-role:", "fn-pb-role:"};
-        //String pathToKafFile = "/Tools/ontotagger-v1.0/naf-example/spinoza-voorbeeld-ukb.ont.xml";
-       // String pathToKafFile = "/Tools/ontotagger-v1.0/naf-example/89007714_06.tok.alpino.ner.ukb.pm.ht.srl.naf";
+        String fns = "";
+        String ilins = "";
+        String [] rnss = null;
         String pathToKafFile = "";
-        Double confidenceThreshold = new Double(0.25);
-        Integer frameThreshold = new Integer(70);
-        String format = "naf";
+        Double confidenceThreshold = -1.0;
+        Integer frameThreshold = -1;
+        String format = "";
+
+/*
+        fns = "fn:";
+        ilins = "mcr:ili";
+        rnss = {"fn-role:", "pb-role:", "fn-pb-role:"};
+        pathToKafFile = "/Tools/nwr-dutch-pipeline/vua-ontotagger-v1.0/example/test.srl.lexicalunits.pm.naf";
+        // pathToKafFile = "/Tools/ontotagger-v1.0/naf-example/spinoza-voorbeeld-ukb.ont.xml";
+        // pathToKafFile = "/Tools/ontotagger-v1.0/naf-example/89007714_06.tok.alpino.ner.ukb.pm.ht.srl.naf";
+        confidenceThreshold = new Double(0.25);
+        frameThreshold = new Integer(70);
+        format = "naf";
+*/
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if ((arg.equalsIgnoreCase("--kaf-file")) && (args.length>(i+1))) {
@@ -53,6 +64,9 @@ public class SrlFrameNetTagger {
             }
             else if ((arg.equalsIgnoreCase("--frame-ns")) && (args.length>(i+1))) {
                 fns = args[i+1];
+            }
+            else if ((arg.equalsIgnoreCase("--ili-ns")) && (args.length>(i+1))) {
+                ilins = args[i+1];
             }
             else if ((arg.equalsIgnoreCase("--role-ns")) && (args.length>(i+1))) {
                 rnss = args[i+1].split(";");
@@ -80,7 +94,7 @@ public class SrlFrameNetTagger {
         String strEndDate = null;
 
         KafSaxParser kafSaxParser = new KafSaxParser();
-        processSrlLayer(kafSaxParser, pathToKafFile, fns, rnss, confidenceThreshold.doubleValue(), frameThreshold.intValue());
+        processSrlLayer(kafSaxParser, pathToKafFile, fns, rnss,ilins,  confidenceThreshold.doubleValue(), frameThreshold.intValue());
 
         strEndDate = eu.kyotoproject.util.DateUtil.createTimestamp();
         String host = "";
@@ -112,6 +126,7 @@ public class SrlFrameNetTagger {
                                         String pathToKafFile,
                                         String fns,
                                         String [] rnss,
+                                        String ilins,
                                         double confidenceThreshold,
                                         int framethreshold) {
         if (pathToKafFile.isEmpty()) {
@@ -126,7 +141,7 @@ public class SrlFrameNetTagger {
                 String termId = event.getSpanIds().get(j);
                 KafTerm kafTerm = kafSaxParser.getTerm(termId);
                 if (kafTerm!=null) {
-                    HashMap<String, ArrayList<SenseFrameRoles>> frameMap = GetDominantMapping.getFrameMap(kafTerm, confidenceThreshold, fns, rnss);
+                    HashMap<String, ArrayList<SenseFrameRoles>> frameMap = GetDominantMapping.getFrameMap(kafTerm, confidenceThreshold, fns, rnss, ilins);
                    // if (frameMap.size()>0) System.out.println("frameMap.size() = " + frameMap.size());
                     double topscore = GetDominantMapping.getTopScore(frameMap);
                     Set keySet = frameMap.keySet();
@@ -153,7 +168,18 @@ public class SrlFrameNetTagger {
                                 sense.setSensecode(senseFrameRoles.getSense());
                                 sense.setConfidence(senseFrameRoles.getConfidence());
                                 sense.setResource(senseFrameRoles.getResource());
-                                event.addExternalReferences(sense);
+                                if (!senseFrameRoles.getIli().isEmpty()) {
+                                    event.addExternalReferences(sense);
+                                    KafSense ili = new KafSense();
+                                    ili.setSensecode(senseFrameRoles.getIli());
+                                    event.addExternalReferences(ili);
+                                }
+                                for (int m = 0; m < senseFrameRoles.getEsoClasses().size(); m++) {
+                                    String s = senseFrameRoles.getEsoClasses().get(m);
+                                    KafSense kafSense = new KafSense();
+                                    kafSense.setSensecode(s);
+                                    event.addExternalReferences(kafSense);
+                                }
                             }
                             for (int k = 0; k < event.getParticipants().size(); k++) {
                                 KafParticipant kafParticipant = event.getParticipants().get(k);
@@ -168,6 +194,12 @@ public class SrlFrameNetTagger {
                                             kafSense.setSensecode(fnRole);
                                             kafParticipant.addExternalReferences(kafSense);
                                         }
+                                    }
+                                    for (int m = 0; m < senseFrameRoles.getEsoRoles().size(); m++) {
+                                        String s = senseFrameRoles.getEsoRoles().get(m);
+                                        KafSense kafSense = new KafSense();
+                                        kafSense.setSensecode(s);
+                                        kafParticipant.addExternalReferences(kafSense);
                                     }
                                 }
                             }

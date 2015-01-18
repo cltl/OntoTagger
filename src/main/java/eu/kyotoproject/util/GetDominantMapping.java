@@ -50,13 +50,13 @@ public class GetDominantMapping {
      */
 
     static public HashMap<String, ArrayList<SenseFrameRoles>> getFrameMap (KafTerm kafTerm, double confidenceThreshold,
-                               String fns, String[] rnss) {
+                               String fns, String[] rnss, String ilins) {
         HashMap<String, ArrayList<SenseFrameRoles>> frameMap = new HashMap<String, ArrayList<SenseFrameRoles>>();
         //// we collect all the frames and data for all the senses
         for (int j = 0; j < kafTerm.getSenseTags().size(); j++) {
             KafSense kafSense = kafTerm.getSenseTags().get(j);
             if (kafSense.getConfidence()>=confidenceThreshold) {
-                GetDominantMapping.getFrames(frameMap, kafSense, fns, rnss);
+                GetDominantMapping.getFrames(frameMap, kafSense, fns, rnss, ilins);
             }
         }
         for (int j = 0; j < kafTerm.getComponents().size(); j++) {
@@ -64,7 +64,7 @@ public class GetDominantMapping {
             for (int k = 0; k < termComponent.getSenseTags().size(); k++) {
                 KafSense kafSense = termComponent.getSenseTags().get(k);
                 if (kafSense.getConfidence()>=confidenceThreshold) {
-                    GetDominantMapping.getFrames(frameMap, kafSense, fns, rnss);
+                    GetDominantMapping.getFrames(frameMap, kafSense, fns, rnss, ilins);
                 }
             }
         }
@@ -91,7 +91,7 @@ public class GetDominantMapping {
 
     static public void getFrames (HashMap<String, ArrayList<SenseFrameRoles>> frameMap,
                            KafSense kafSense,
-                           String fns, String[] rns) {
+                           String fns, String[] rns, String ilins) {
        // System.out.println("kafSense.getSensecode() = " + kafSense.getSensecode());
         for (int i = 0; i < kafSense.getChildren().size(); i++) {
             KafSense child = kafSense.getChildren().get(i);
@@ -100,6 +100,24 @@ public class GetDominantMapping {
             String frame = "";
             SenseFrameRoles senseFrameRoles = new SenseFrameRoles();
             /// we first look for the frame that matches the names space prefix
+            String iliReference = "";
+            for (int j = 0; j < child.getChildren().size(); j++) {
+                KafSense grandChild = child.getChildren().get(j);
+                //System.out.println("grandChild.getSensecode() = " + grandChild.getSensecode());
+                ///these are the mappings found
+                //<externalRef reference="mcr:ili-30-02604760-v" resource="mcr"/>
+                if (grandChild.getSensecode().startsWith(ilins)) {
+                    int idx = grandChild.getSensecode().indexOf(":");
+                    if (idx>-1) {
+                        iliReference = grandChild.getSensecode().substring(idx+1);
+                    }
+                    else {
+                        iliReference = grandChild.getSensecode();
+                    }
+                    break;
+                }
+            }
+
             for (int j = 0; j < child.getChildren().size(); j++) {
                 KafSense grandChild = child.getChildren().get(j);
                 //System.out.println("grandChild.getSensecode() = " + grandChild.getSensecode());
@@ -110,6 +128,7 @@ public class GetDominantMapping {
                     senseFrameRoles.setConfidence(kafSense.getConfidence());
                     senseFrameRoles.setResource(kafSense.getResource());
                     senseFrameRoles.setFrame(grandChild.getSensecode());
+                    senseFrameRoles.setIli(iliReference);
                     frame = senseFrameRoles.getFrame();
                     break;
                 }
@@ -127,6 +146,14 @@ public class GetDominantMapping {
                             senseFrameRoles.addRoles(grandChild.getSensecode());
                         }
                     }
+                    if (grandChild.getSensecode().startsWith("eso:")) {
+                       if (grandChild.getSensecode().toLowerCase().equals(grandChild.getSensecode())) {
+                           /// this is a lowercase role
+                           senseFrameRoles.addEsoRoles(grandChild.getSensecode());
+                       }else {
+                           senseFrameRoles.addEsoClasses(grandChild.getSensecode());
+                       }
+                    }
                 }
                 if (frameMap.containsKey(frame)) {
                     ArrayList<SenseFrameRoles> data = frameMap.get(frame);
@@ -138,6 +165,14 @@ public class GetDominantMapping {
                     data.add(senseFrameRoles);
                     frameMap.put(frame, data);
                 }
+            }
+            else {
+                ////
+                if (!iliReference.isEmpty()) {
+                    ArrayList<SenseFrameRoles> data = new ArrayList<SenseFrameRoles>();
+                    frameMap.put(iliReference, data);
+                }
+
             }
 
         }
