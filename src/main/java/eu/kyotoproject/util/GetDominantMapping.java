@@ -107,6 +107,9 @@ public class GetDominantMapping {
                 ///these are the mappings found
                 //<externalRef reference="mcr:ili-30-02604760-v" resource="mcr"/>
                 if (grandChild.getSensecode().startsWith(ilins)) {
+                    iliReference = grandChild.getSensecode();
+
+/*
                     int idx = grandChild.getSensecode().indexOf(":");
                     if (idx>-1) {
                         iliReference = grandChild.getSensecode().substring(idx+1);
@@ -114,7 +117,7 @@ public class GetDominantMapping {
                     else {
                         iliReference = grandChild.getSensecode();
                     }
-                    break;
+*/
                 }
             }
 
@@ -172,7 +175,6 @@ public class GetDominantMapping {
                     ArrayList<SenseFrameRoles> data = new ArrayList<SenseFrameRoles>();
                     frameMap.put(iliReference, data);
                 }
-
             }
 
         }
