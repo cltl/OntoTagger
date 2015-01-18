@@ -10,6 +10,8 @@ import eu.kyotoproject.util.Util;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 /**
@@ -120,7 +122,13 @@ public class KafOntotaggerFolder {
             }
 
             strEndDate = eu.kyotoproject.util.DateUtil.createTimestamp();
-            LP lp = new LP(name,version, strBeginDate, strBeginDate, strEndDate);
+            String host = "";
+            try {
+                host = InetAddress.getLocalHost().getHostName();
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+            LP lp = new LP(name,version, strBeginDate, strBeginDate, strEndDate, host);
             kafSaxParser.getKafMetaData().addLayer(layer, lp);
             try {
                 OutputStream fos = new FileOutputStream(pathToKafFile+".ont.kaf");

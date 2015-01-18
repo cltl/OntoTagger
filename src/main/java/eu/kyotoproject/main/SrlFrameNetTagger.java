@@ -4,6 +4,8 @@ import eu.kyotoproject.kaf.*;
 import eu.kyotoproject.rdf.SenseFrameRoles;
 import eu.kyotoproject.util.GetDominantMapping;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -81,8 +83,16 @@ public class SrlFrameNetTagger {
         processSrlLayer(kafSaxParser, pathToKafFile, fns, rnss, confidenceThreshold.doubleValue(), frameThreshold.intValue());
 
         strEndDate = eu.kyotoproject.util.DateUtil.createTimestamp();
-        LP lp = new LP(name,version, strBeginDate, strBeginDate, strEndDate);
+        String host = "";
+        try {
+            host = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        LP lp = new LP(name,version, strBeginDate, strBeginDate, strEndDate, host);
         kafSaxParser.getKafMetaData().addLayer(layer, lp);
+
+
         if (format.equalsIgnoreCase("naf")) {
             kafSaxParser.writeNafToStream(System.out);
 /*            try {
