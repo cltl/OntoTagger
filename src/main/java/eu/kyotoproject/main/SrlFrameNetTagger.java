@@ -135,6 +135,18 @@ public class SrlFrameNetTagger {
             else if (ns.toLowerCase().equals("pb")) {
                 resource = "ProbBank";
             }
+            else if (ns.toLowerCase().equals("fn-role")) {
+                resource = "FrameNet";
+            }
+            else if (ns.toLowerCase().equals("fn-pb-role")) {
+                resource = "FrameNet";
+            }
+            else if (ns.toLowerCase().equals("pb-role")) {
+                resource = "PropBank";
+            }
+            else if (ns.toLowerCase().equals("vn-role")) {
+                resource = "VerbNet";
+            }
             else if (ns.toLowerCase().equals("nb")) {
                 resource = "NomBank";
             }
@@ -155,13 +167,15 @@ public class SrlFrameNetTagger {
     }
 
     static String removeNameSpaceFromSenseCode (KafSense kafSense) {
-        String reference = "";
-        int idx = kafSense.getSensecode().indexOf(":");
+        String reference = removeNameSpaceFromSenseString(kafSense.getSensecode());
+        return reference;
+    }
+
+    static String removeNameSpaceFromSenseString (String kafSense) {
+        String reference = kafSense;
+        int idx = kafSense.indexOf(":");
         if (idx>-1) {
-            reference = kafSense.getSensecode().substring(idx+1);
-        }
-        else {
-            reference = kafSense.getSensecode();
+            reference = kafSense.substring(idx+1);
         }
         return reference;
     }
@@ -247,12 +261,14 @@ public class SrlFrameNetTagger {
                                                 String fnPbRole = senseFrameRoles.getRoles().get(m);
                                                 String fnRole = matchPropBankFrameNetRole(fnPbRole, role);
                                                 if (!fnRole.isEmpty()) {
+                                                    fnRole = removeNameSpaceFromSenseString(fnRole);
                                                     KafSense kafSense = new KafSense();
-                                                    kafSense.setSensecode(fnRole);
+                                                    kafSense.setSensecode(key+"@"+fnRole);
                                                     fixExternalReference(kafSense);
                                                     kafParticipant.addExternalReferences(kafSense);
                                                 }
                                             }
+                                            /// need to find a way to combine them with ESO classes
                                             for (int m = 0; m < senseFrameRoles.getEsoRoles().size(); m++) {
                                                 String s = senseFrameRoles.getEsoRoles().get(m);
                                                 KafSense kafSense = new KafSense();

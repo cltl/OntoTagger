@@ -140,13 +140,11 @@ public class GetDominantMapping {
                             senseFrameRoles.addRoles(grandChild.getSensecode());
                         }
                     }
-                    if (grandChild.getSensecode().startsWith("eso:")) {
-                       if (grandChild.getSensecode().toLowerCase().equals(grandChild.getSensecode())) {
-                           /// this is a lowercase role
+                    if (grandChild.getSensecode().startsWith("eso-role:")) {
                            senseFrameRoles.addEsoRoles(grandChild.getSensecode());
-                       }else {
+                    }
+                    if (grandChild.getSensecode().startsWith("eso:")) {
                            senseFrameRoles.addEsoClasses(grandChild.getSensecode());
-                       }
                     }
                 }
                 if (frameMap.containsKey(frame)) {
