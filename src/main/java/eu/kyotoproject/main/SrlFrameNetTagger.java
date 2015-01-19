@@ -123,7 +123,7 @@ public class SrlFrameNetTagger {
     }
 
     static String getResourceFromSenseCode (KafSense kafSense) {
-        String resource = "";
+        String resource = kafSense.getResource();
         int idx = kafSense.getSensecode().indexOf(":");
       //  System.out.println("kafSense = " + kafSense.getSensecode());
         if (idx>-1) {
@@ -188,93 +188,113 @@ public class SrlFrameNetTagger {
             KafEvent event = kafSaxParser.getKafEventArrayList().get(i);
             for (int j = 0; j < event.getSpanIds().size(); j++) {
                 String termId = event.getSpanIds().get(j);
+                /// we are assuming that predicates have a span size of one term!!!!
                 KafTerm kafTerm = kafSaxParser.getTerm(termId);
                 if (kafTerm!=null) {
                     HashMap<String, ArrayList<SenseFrameRoles>> frameMap = GetDominantMapping.getFrameMap(kafTerm, confidenceThreshold, fns, rnss, ilins);
-                   // if (frameMap.size()>0) System.out.println("frameMap.size() = " + frameMap.size());
-                    double topscore = GetDominantMapping.getTopScore(frameMap);
-                    Set keySet = frameMap.keySet();
-                    Iterator<String> keys = keySet.iterator();
-                    while (keys.hasNext()) {
-                        String key = keys.next();
-                       // System.out.println("frame = " + key);
-                        double score = 0;
-                        ArrayList<SenseFrameRoles> data = frameMap.get(key);
-                        if (data.size()==0) {
-                            /// this is a ILI reference without FN references
-                            /// we simply output the ili-reference
-                            KafSense frame = new KafSense();
-                            frame.setSensecode(key);
-                            fixExternalReference(frame);
-                            event.addExternalReferences(frame);
-                        }
-                        else {
-                            /// we did get FN references and data so we use these for the output
-                            for (int f = 0; f < data.size(); f++) {
-                                SenseFrameRoles senseFrameRoles = data.get(f);
-                                score += senseFrameRoles.getConfidence();
-                            }
-                            if ((100 * (score / topscore)) > framethreshold) {
-                                KafSense frame = new KafSense();
-                                frame.setSensecode(key);
-                                fixExternalReference(frame);
-                                frame.setConfidence(score / topscore);
-                                frame.setConfidence(data.size());
-                                frame.setConfidence(score);
-                                event.addExternalReferences(frame);
-                                for (int k = 0; k < data.size(); k++) {
-                                    SenseFrameRoles senseFrameRoles = data.get(k);
-                                    KafSense sense = new KafSense();
-                                    sense.setSensecode(senseFrameRoles.getSense());
-                                    sense.setConfidence(senseFrameRoles.getConfidence());
-                                    sense.setResource(senseFrameRoles.getResource());
-                                    fixExternalReference(sense);
-                                    event.addExternalReferences(sense);
-                                    if (!senseFrameRoles.getIli().isEmpty()) {
-                                        KafSense ili = new KafSense();
-                                        ili.setSensecode(senseFrameRoles.getIli());
-                                        fixExternalReference(ili);
-                                        event.addExternalReferences(ili);
-                                    }
-                                    for (int m = 0; m < senseFrameRoles.getEsoClasses().size(); m++) {
-                                        String s = senseFrameRoles.getEsoClasses().get(m);
-                                        KafSense kafSense = new KafSense();
-                                        kafSense.setSensecode(s);
-                                        fixExternalReference(kafSense);
-                                        event.addExternalReferences(kafSense);
-                                    }
+                    if (frameMap.size()>0) {
+                        System.out.println("frameMap.size() = " + frameMap.size());
+                        double topscore = GetDominantMapping.getTopScore(frameMap);
+                        Set keySet = frameMap.keySet();
+                        Iterator<String> keys = keySet.iterator();
+                        while (keys.hasNext()) {
+                            String key = keys.next();
+                            // System.out.println("frame = " + key);
+                            double score = 0;
+                            ArrayList<SenseFrameRoles> data = frameMap.get(key);
+                            if (data.size()> 0) {
+                                /// we did get FN references and data so we use these for the output
+                                for (int f = 0; f < data.size(); f++) {
+                                    SenseFrameRoles senseFrameRoles = data.get(f);
+                                    score += senseFrameRoles.getSense().getConfidence();
                                 }
-                                for (int k = 0; k < event.getParticipants().size(); k++) {
-                                    KafParticipant kafParticipant = event.getParticipants().get(k);
-                                    String role = kafParticipant.getRole();
-                                    for (int l = 0; l < data.size(); l++) {
-                                        SenseFrameRoles senseFrameRoles = data.get(l);
-                                        for (int m = 0; m < senseFrameRoles.getRoles().size(); m++) {
-                                            String fnPbRole = senseFrameRoles.getRoles().get(m);
-                                            String fnRole = matchPropBankFrameNetRole(fnPbRole, role);
-                                            if (!fnRole.isEmpty()) {
+                                if ((100 * (score / topscore)) > framethreshold) {
+                                    KafSense frame = new KafSense();
+                                    frame.setSensecode(key);
+                                    fixExternalReference(frame);
+                                    frame.setConfidence(score / topscore);
+                                    frame.setConfidence(data.size());
+                                    frame.setConfidence(score);
+                                    event.addExternalReferences(frame);
+                                    for (int k = 0; k < data.size(); k++) {
+                                        SenseFrameRoles senseFrameRoles = data.get(k);
+                                        KafSense sense = new KafSense();
+                                        sense.setSensecode(senseFrameRoles.getSense().getSensecode());
+                                        sense.setConfidence(senseFrameRoles.getSense().getConfidence());
+                                        sense.setResource(senseFrameRoles.getSense().getResource());
+                                        fixExternalReference(sense);
+                                        event.addExternalReferences(sense);
+                                        if (!senseFrameRoles.getIli().isEmpty()) {
+                                            KafSense ili = new KafSense();
+                                            ili.setSensecode(senseFrameRoles.getIli());
+                                            fixExternalReference(ili);
+                                            event.addExternalReferences(ili);
+                                        }
+                                        for (int m = 0; m < senseFrameRoles.getEsoClasses().size(); m++) {
+                                            String s = senseFrameRoles.getEsoClasses().get(m);
+                                            KafSense kafSense = new KafSense();
+                                            kafSense.setSensecode(s);
+                                            fixExternalReference(kafSense);
+                                            event.addExternalReferences(kafSense);
+                                        }
+                                    }
+                                    for (int k = 0; k < event.getParticipants().size(); k++) {
+                                        KafParticipant kafParticipant = event.getParticipants().get(k);
+                                        String role = kafParticipant.getRole();
+                                        for (int l = 0; l < data.size(); l++) {
+                                            SenseFrameRoles senseFrameRoles = data.get(l);
+                                            for (int m = 0; m < senseFrameRoles.getRoles().size(); m++) {
+                                                String fnPbRole = senseFrameRoles.getRoles().get(m);
+                                                String fnRole = matchPropBankFrameNetRole(fnPbRole, role);
+                                                if (!fnRole.isEmpty()) {
+                                                    KafSense kafSense = new KafSense();
+                                                    kafSense.setSensecode(fnRole);
+                                                    fixExternalReference(kafSense);
+                                                    kafParticipant.addExternalReferences(kafSense);
+                                                }
+                                            }
+                                            for (int m = 0; m < senseFrameRoles.getEsoRoles().size(); m++) {
+                                                String s = senseFrameRoles.getEsoRoles().get(m);
                                                 KafSense kafSense = new KafSense();
-                                                kafSense.setSensecode(fnRole);
+                                                kafSense.setSensecode(s);
                                                 fixExternalReference(kafSense);
                                                 kafParticipant.addExternalReferences(kafSense);
                                             }
                                         }
-                                        for (int m = 0; m < senseFrameRoles.getEsoRoles().size(); m++) {
-                                            String s = senseFrameRoles.getEsoRoles().get(m);
-                                            KafSense kafSense = new KafSense();
-                                            kafSense.setSensecode(s);
-                                            fixExternalReference(kafSense);
-                                            kafParticipant.addExternalReferences(kafSense);
-                                        }
+                                        role = normalizePropBankRole(role);
+                                        kafParticipant.setRole(role);
                                     }
+                                    //// now check to participants of the events to add the roles
+                                    //System.out.println("score = " + score);
+                                    //System.out.println(data.toString());
                                 }
-                                //// now check to participants of the events to add the roles
-                                //System.out.println("score = " + score);
-                                //System.out.println(data.toString());
                             }
                         }
                     }
-
+                    else {
+                        ///// there is no framenetmapping, so we get the top senses of the predicate
+                        for (int k = 0; k < kafTerm.getSenseTags().size(); k++) {
+                            KafSense kafSense = kafTerm.getSenseTags().get(j);
+                            KafSense refSense = new KafSense();
+                            refSense.setResource(kafSense.getResource());
+                            refSense.setConfidence(kafSense.getConfidence());
+                            refSense.setSensecode(kafSense.getSensecode());
+                            event.addExternalReferences(refSense);
+                            if (kafSense.getChildren().size()>0) {
+                                //// we take the first sense which has the highest score
+                                KafSense child = kafSense.getChildren().get(0);
+                               // event.addExternalReferences(child);
+                                for (int c = 0; c < child.getChildren().size(); c++) {
+                                    KafSense grandChild = child.getChildren().get(j);
+                                    //<externalRef reference="mcr:ili-30-02604760-v" resource="mcr"/>
+                                    if (grandChild.getSensecode().startsWith(ilins)) {
+                                        fixExternalReference(grandChild);
+                                        event.addExternalReferences(grandChild);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
             }
@@ -282,18 +302,28 @@ public class SrlFrameNetTagger {
     }
 
     static String matchPropBankFrameNetRole (String fnPbRole, String pbRole) {
-        if (pbRole.toLowerCase().startsWith("arg")) {
+        ///fn-pb-role:Entity#2
+        ///fn-pb-role:Content#1
+        if (pbRole.toLowerCase().startsWith("arg") |
+                (pbRole.startsWith("A"))) {
             int idx = fnPbRole.lastIndexOf("#");
             if (idx > -1) {
                 String suffix = fnPbRole.substring(idx+1);
-/*                System.out.println("suffix = " + suffix);
-                System.out.println("pbRole = " + pbRole);
-                System.out.println("fnPbRole = " + fnPbRole);*/
                 if (pbRole.endsWith(suffix)) {
                     return fnPbRole.substring(0, idx);
                 }
             }
+            else {
+            }
         }
         return "";
+    }
+
+    static String normalizePropBankRole (String pbRole) {
+        String newRole = pbRole;
+        if (pbRole.toLowerCase().startsWith("arg")) {
+            newRole = "A"+pbRole.substring(3);
+        }
+        return newRole;
     }
 }

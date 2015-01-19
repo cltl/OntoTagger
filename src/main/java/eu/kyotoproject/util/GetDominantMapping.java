@@ -81,7 +81,7 @@ public class GetDominantMapping {
             ArrayList<SenseFrameRoles> data = frameMap.get(key);
             for (int j = 0; j < data.size(); j++) {
                 SenseFrameRoles senseFrameRoles = data.get(j);
-                score += senseFrameRoles.getConfidence();
+                score += senseFrameRoles.getSense().getConfidence();
             }
             if (score>topscore) topscore = score;
         }
@@ -92,14 +92,15 @@ public class GetDominantMapping {
     static public void getFrames (HashMap<String, ArrayList<SenseFrameRoles>> frameMap,
                            KafSense kafSense,
                            String fns, String[] rns, String ilins) {
-       // System.out.println("kafSense.getSensecode() = " + kafSense.getSensecode());
+
+        /// we iterate over all the senses
         for (int i = 0; i < kafSense.getChildren().size(); i++) {
             KafSense child = kafSense.getChildren().get(i);
             //     <externalRef resource="predicate-matrix1.1">
             //System.out.println("child = " + child.getResource());
             String frame = "";
             SenseFrameRoles senseFrameRoles = new SenseFrameRoles();
-            /// we first look for the frame that matches the names space prefix
+            /// we first look if there is a ili reference
             String iliReference = "";
             for (int j = 0; j < child.getChildren().size(); j++) {
                 KafSense grandChild = child.getChildren().get(j);
@@ -108,28 +109,18 @@ public class GetDominantMapping {
                 //<externalRef reference="mcr:ili-30-02604760-v" resource="mcr"/>
                 if (grandChild.getSensecode().startsWith(ilins)) {
                     iliReference = grandChild.getSensecode();
-
-/*
-                    int idx = grandChild.getSensecode().indexOf(":");
-                    if (idx>-1) {
-                        iliReference = grandChild.getSensecode().substring(idx+1);
-                    }
-                    else {
-                        iliReference = grandChild.getSensecode();
-                    }
-*/
                 }
             }
+            /// we next look for the first frame that matches the names space prefix
 
             for (int j = 0; j < child.getChildren().size(); j++) {
                 KafSense grandChild = child.getChildren().get(j);
                 //System.out.println("grandChild.getSensecode() = " + grandChild.getSensecode());
                 ///these are the mappings found
+                /// We take the first mapping here
                 if (grandChild.getSensecode().startsWith(fns)) {
                     senseFrameRoles = new SenseFrameRoles();
-                    senseFrameRoles.setSense(kafSense.getSensecode());
-                    senseFrameRoles.setConfidence(kafSense.getConfidence());
-                    senseFrameRoles.setResource(kafSense.getResource());
+                    senseFrameRoles.setSense(kafSense);
                     senseFrameRoles.setFrame(grandChild.getSensecode());
                     senseFrameRoles.setIli(iliReference);
                     frame = senseFrameRoles.getFrame();
@@ -171,10 +162,7 @@ public class GetDominantMapping {
             }
             else {
                 ////
-                if (!iliReference.isEmpty()) {
-                    ArrayList<SenseFrameRoles> data = new ArrayList<SenseFrameRoles>();
-                    frameMap.put(iliReference, data);
-                }
+
             }
 
         }

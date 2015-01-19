@@ -1,5 +1,7 @@
 package eu.kyotoproject.rdf;
 
+import eu.kyotoproject.kaf.KafSense;
+
 import java.util.ArrayList;
 
 /**
@@ -22,10 +24,8 @@ public class SenseFrameRoles {
      </externalRef>
      */
 
-    private double confidence;
     private String ili;
-    private String sense;
-    private String resource;
+    private KafSense sense;
     private String frame;
     private String frameNetLexicalUnit;
     private String propBankLexicalUnit;
@@ -37,10 +37,8 @@ public class SenseFrameRoles {
     private ArrayList<String> roles;
 
     public SenseFrameRoles() {
-        this.confidence = 0;
-        this.resource = "";
         this.ili = "";
-        this.sense = "";
+        this.sense = new KafSense();
         this.frame = "";
         this.frameNetLexicalUnit = "";
         this.propBankLexicalUnit = "";
@@ -60,27 +58,11 @@ public class SenseFrameRoles {
         this.ili = ili;
     }
 
-    public String getResource() {
-        return resource;
-    }
-
-    public void setResource(String resource) {
-        this.resource = resource;
-    }
-
-    public double getConfidence() {
-        return confidence;
-    }
-
-    public void setConfidence(double confidence) {
-        this.confidence = confidence;
-    }
-
-    public String getSense() {
+    public KafSense getSense() {
         return sense;
     }
 
-    public void setSense(String sense) {
+    public void setSense(KafSense sense) {
         this.sense = sense;
     }
 
@@ -186,7 +168,6 @@ public class SenseFrameRoles {
         String str = "[\n";
         str += "   frame = \"" + this.getFrame()+"\",\n";
         str += "   sense = \"" + this.getSense()+"\",\n";
-        str += "   conf = \"" + this.getConfidence()+"\",\n";
         str += "   roles = \"";
 
         for (int i = 0; i < roles.size(); i++) {
