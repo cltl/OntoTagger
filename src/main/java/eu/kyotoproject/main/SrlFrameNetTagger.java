@@ -207,7 +207,7 @@ public class SrlFrameNetTagger {
                 if (kafTerm!=null) {
                     HashMap<String, ArrayList<SenseFrameRoles>> frameMap = GetDominantMapping.getFrameMap(kafTerm, confidenceThreshold, fns, rnss, ilins);
                     if (frameMap.size()>0) {
-                        System.out.println("frameMap.size() = " + frameMap.size());
+                       // System.out.println("frameMap.size() = " + frameMap.size());
                         double topscore = GetDominantMapping.getTopScore(frameMap);
                         Set keySet = frameMap.keySet();
                         Iterator<String> keys = keySet.iterator();
