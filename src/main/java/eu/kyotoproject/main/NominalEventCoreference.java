@@ -25,9 +25,9 @@ public class NominalEventCoreference {
 
     static public void main (String[] args) {
     	String pathToKafFile = "";
-        pathToKafFile = "/Users/piek/Desktop/tweede-kamer/NAF-Analysis/ABN-AMRO/602597.xml.19k2ubmrl.xml";
+       // pathToKafFile = "/Users/piek/Desktop/tweede-kamer/NAF-Analysis/ABN-AMRO/602597.xml.19k2ubmrl.xml";
         String pathToFrameNetLuFile = "";
-        pathToFrameNetLuFile = "/Tools/nwr-dutch-pipeline/vua-ontotagger-v1.0/resources/nl-luIndex.xml";
+      //  pathToFrameNetLuFile = "/Tools/nwr-dutch-pipeline/vua-ontotagger-v1.0/resources/nl-luIndex.xml";
 
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
@@ -75,7 +75,7 @@ public class NominalEventCoreference {
             else if (kafTerm.getPosIni().equalsIgnoreCase("n") && kafTerm.getSenseTags().size()==0) {
                 if (frameNetLuReader.lexicalUnitFrameMap.containsKey(kafTerm.getLemma())) {
                     ArrayList<String> frames = frameNetLuReader.lexicalUnitFrameMap.get(kafTerm.getLemma());
-                    System.out.println("frames.toString() = " + frames.toString());
+                  //  System.out.println("frames.toString() = " + frames.toString());
                     for (int j = 0; j < frames.size(); j++) {
                         String frame = frames.get(j);
                         KafSense kafSense = new KafSense();
