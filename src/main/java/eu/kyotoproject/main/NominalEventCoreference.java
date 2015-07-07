@@ -46,6 +46,7 @@ public class NominalEventCoreference {
         String strEndDate = null;
         KafSaxParser kafSaxParser = new KafSaxParser();
         if (pathToKafFile.isEmpty()) {
+            //kafSaxParser.encoding = "UTF-8";
             kafSaxParser.parseFile(System.in);
         }
         else {

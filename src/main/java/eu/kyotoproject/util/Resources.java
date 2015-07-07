@@ -2,13 +2,8 @@ package eu.kyotoproject.util;
 
 import eu.kyotoproject.kaf.KafSense;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Vector;
+import java.io.*;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,7 +32,53 @@ public class Resources {
         relationArrayList = new ArrayList<String>();
     }
 
+    static public void main (String[] args) {
+        try {
+            String pathToPredicateMatrixFile = "";
+            pathToPredicateMatrixFile = "/Tools/ontotagger-v1.0/resources/PredicateMatrix.v1.2/PredicateMatrix_withESO.txt";
+            pathToPredicateMatrixFile = "/Code/vu/WordnetTools/resources/PredicateMatrix_withESO.v0.2.txt.role";
+            OutputStream fos = new FileOutputStream(pathToPredicateMatrixFile+"wnfn");
+            Resources resources = new Resources();
+            resources.processMatrixFile(pathToPredicateMatrixFile, "mcr", "");
+            Set keySet = resources.wordNetPredicateMap.keySet();
+            Iterator<String> keys = keySet.iterator();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                String fnRelations = "";
+                ArrayList<String> frames = new ArrayList<String>();
+                ArrayList<ArrayList<String>> mappingSets = resources.wordNetPredicateMap.get(key);
+                for (int i = 0; i < mappingSets.size(); i++) {
+                    ArrayList<String> mapping = mappingSets.get(i);
+                    for (int j = 0; j < mapping.size(); j++) {
+                        String s = mapping.get(j);
+                        if (s.startsWith("fn:")) {
+                            if (!frames.contains(s)) {frames.add(s);}
 
+                        }
+                    }
+
+                }
+                if (frames.size()>0) {
+                    /*
+                    <Synset id="fn:Vehicle_landing">
+                     */
+                   String str = "<Synset id=\""+key+"\">\n";
+                    for (int i = 0; i < frames.size(); i++) {
+                        String frame = frames.get(i);
+                         /*
+                            <SynsetRelation relType="has_hyperonym" target="eso:Arriving"/>
+                             */
+                        str += "<SynsetRelation relType=\"has_hyperonym\" target=\""+frame+"\"/>\n";
+                    }
+                    str += "</Synset>\n";
+                    fos.write(str.getBytes());
+                }
+            }
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void extendExternalReference (ArrayList<String> coveredClasses, KafSense externalRef) {
         ArrayList<String> targets = ontologyOntologyMap.get(externalRef.getSensecode());
@@ -250,134 +291,7 @@ vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:01 
         }
     }
 
-/*    String [] processMatrixFileVersion1IntoFields (String inputLine) {
-        String [] fields = null;
-        return fields;
 
-        //vn:appear-48.1.1 vn:48.1.1 vn:null vn:null vn:pop_up wn:NULL vn:NULL fn:NULL fn:NULL fn:NULL pb:NULL pb:NULL mcr:NULL mcr:NULL mcr:NULL mcr:NULL
-        //vn:appear-48.1.1 vn:48.1.1 vn:null vn:null vn:show_up wn:NULL vn:NULL fn:NULL fn:NULL fn:NULL pb:NULL pb:NULL mcr:NULL mcr:NULL mcr:NULL mcr:NULL
-        //vn:appear-48.1.1 vn:48.1.1 vn:null vn:null vn:spring up wn:NULL vn:NULL fn:NULL fn:NULL fn:NULL pb:NULL pb:NULL mcr:NULL mcr:NULL mcr:NULL
-        //vn:appear-48.1.1 vn:48.1.1 vn:null vn:null vn:take shape wn:NULL vn:NULL fn:NULL fn:NULL fn:NULL pb:NULL pb:NULL mcr:NULL mcr:NULL mcr:NULL
-    }
-
-    *//**
-     * Stores lemma and synset key. Only works for matrix version 1
-     * @param file
-     *//*
-    public void processMatrixFileWithWordNetSynset (String file) {
-        try {
-           *//*
-           VN_CLASS VN_CLASS_NUMBER VN_SUBCLASS VN_SUBCLASS_NUMBER VN_LEMA WN_SENSE VN_THEMROLE FN_FRAME FN_LEXENT FN_ROLE PB_ROLESET PB_ARG MCR_ILIOFFSET MCR_DOMAIN MCR_SUMO MC_LEXNAME
-vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misconstrue wn:misconstrue%2:31:01 vn:Experiencer fn:NULL fn:NULL fn:NULL pb:misconstrue.01 pb:0 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
-vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misconstrue wn:misconstrue%2:31:01 vn:Attribute fn:NULL fn:NULL fn:NULL pb:misconstrue.01 pb:1 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
-vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misconstrue wn:misconstrue%2:31:01 vn:Stimulus fn:NULL fn:NULL fn:NULL pb:misconstrue.01 pb:NULL mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
-vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:02 vn:Experiencer fn:NULL fn:NULL fn:NULL pb:misinterpret.01 pb:0 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
-vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:02 vn:Attribute fn:NULL fn:NULL fn:NULL pb:misinterpret.01 pb:2 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
-
-            *//*
-            String [] headers = null;
-            FileInputStream fis = new FileInputStream(file);
-            InputStreamReader isr = new InputStreamReader(fis);
-            BufferedReader in = new BufferedReader(isr);
-            String inputLine = "";
-            String synset = "";
-            String senseKey ="";
-            String lemma = "";
-            while (in.ready()&&(inputLine = in.readLine()) != null) {
-                if (inputLine.trim().length()>0) {
-*//*                    if (inputLine.indexOf("wn:die%2:30:00")==-1) {
-                        continue;
-                    }*//*
-                    String[] fields = inputLine.split(" ");
-                    //System.out.println("fields = " + fields);
-                    synset = "";
-                    lemma= "";
-                    if (fields.length>=15) {
-
-                        if (!fields[12].startsWith("mcr:")) {
-                           // System.out.println("Error processing inputLine = " + inputLine);
-                            continue;
-                        }
-                        //// takes wn sense key as the key
-                        synset = fields[12].substring(4);  //mcr:eng-30-00619869-v
-                        senseKey = fields[5]; /// wn:misconstrue%2:31:01
-                        //System.out.println("senseKey = " + senseKey);
-                        lemma = senseKey.substring(3);
-                        int idx = lemma.indexOf("%");
-                        if (idx!=-1) {
-                            lemma = lemma.substring(0, idx);
-                        }
-                        if (lemma.isEmpty()) {
-                            continue;
-                        }
-                        if (wordNetLemmaSenseMap.containsKey(lemma)) {
-                            ArrayList<String> synsets = wordNetLemmaSenseMap.get(lemma);
-                            if (!synsets.contains(synset)) {
-                                synsets.add(synset);
-                                wordNetLemmaSenseMap.put(lemma, synsets);
-                            }
-                        }
-                        else {
-                            ArrayList<String> synsets =new ArrayList<String>();
-                            synsets.add(synset);
-                            wordNetLemmaSenseMap.put(lemma, synsets);
-                        }
-                        ArrayList<String> sourceFields = new ArrayList<String>();
-                        for (int i = 0; i < fields.length; i++) {
-                            String field = fields[i];
-                            if (field.toLowerCase().indexOf("null")==-1) {
-                                sourceFields.add(field);
-                            }
-                        }
-                        if (sourceFields.size()>0) {
-                            if (wordNetPredicateMap.containsKey(synset)) {
-                                ArrayList<ArrayList<String>> targets = wordNetPredicateMap.get(synset);
-                                if (!hasSourceField(targets, sourceFields)) {
-                                    targets.add(sourceFields);
-                                    wordNetPredicateMap.put(synset, targets);
-
-                                }*//*                                for (int i = 0; i < sourceFields.size(); i++) {
-                                    String s = sourceFields.get(i);
-                                    if (!targets.contains(s)) {
-                                        targets.add(s);
-                                    }
-                                }*//*
-                                wordNetPredicateMap.put(synset, targets);
-                            }
-                            else {
-                                ArrayList<ArrayList<String>> targets = new ArrayList<ArrayList<String>>();
-                                targets.add(sourceFields);
-                                wordNetPredicateMap.put(synset, targets);
-                            }
-                        }
-                    }
-                    else {*//*
-                        System.out.println("Error in inputLine = " + inputLine);
-                        System.out.println("fields.length = " + fields.length);
-                        for (int i = 0; i < fields.length; i++) {
-                            String field = fields[i];
-                            System.out.println("field = " + field);
-                        }*//*
-                    }
-                }
-            }
-*//*            Set keySet = wordNetLemmaSenseMap.keySet();
-            Iterator keys = keySet.iterator();
-            while (keys.hasNext()) {
-                String key = (String) keys.next();
-                String str = key+"#";
-                ArrayList<String> sense = wordNetLemmaSenseMap.get(key);
-                for (int i = 0; i < sense.size(); i++) {
-                    String s = sense.get(i);
-                    str+=s+";";
-                }
-                System.out.println(str);
-
-            }*//*
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-    }*/
 
     public void processMatrixFileWithWordnetILI (String file) {
         try {
@@ -496,7 +410,9 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
         }
     }
 
-    public void processMatrixFile (String file, String key, String prefix) {
+    public void processMatrixFile (String file,
+                                   String key,
+                                   String prefix) {
         try {
            /*
            VN_CLASS VN_CLASS_NUMBER VN_SUBCLASS VN_SUBCLASS_NUMBER VN_LEMA WN_SENSE VN_THEMROLE FN_FRAME FN_LEXENT FN_ROLE PB_ROLESET PB_ARG MCR_ILIOFFSET MCR_DOMAIN MCR_SUMO MC_LEXNAME
@@ -517,12 +433,16 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
             while (in.ready()&&(inputLine = in.readLine()) != null) {
                 if (inputLine.trim().length()>0) {
                     String[] fields = inputLine.split(" ");
+                    if (fields.length==1) {
+                        fields = inputLine.split("\t");
+                    }
+                   // System.out.println("fields.length = " + fields.length);
                     synset = "";
                     ///get synset identifier
                     for (int i = 0; i < fields.length; i++) {
                         String field = fields[i];
                         if (field.startsWith(key)) {
-                            // System.out.println("field = " + field);
+                           //  System.out.println("field = " + field);
                             int idx = field.lastIndexOf(":");
                             if (idx > -1) {
                                 synset = field.substring(idx + 1);
@@ -542,6 +462,9 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
                                }
                             }
                             break;
+                        }
+                        else {
+                         //   System.out.println("field = " + field);
                         }
                     }
 

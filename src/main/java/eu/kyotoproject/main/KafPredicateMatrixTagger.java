@@ -289,7 +289,8 @@ public class KafPredicateMatrixTagger {
             for (int m = 0; m < mappings.size(); m++) {
                 boolean match = false;
                 KafSense mChild = new KafSense ();
-                mChild.setResource("predicate-matrix"+pmVersion);
+                mChild.setResource("predicate-matrix");
+                mChild.setSensecode(pmVersion);
                 ArrayList<String> mapping =  mappings.get(m);
                 for (int k = 1; k < mapping.size(); k++) {
                     String s = mapping.get(k);
