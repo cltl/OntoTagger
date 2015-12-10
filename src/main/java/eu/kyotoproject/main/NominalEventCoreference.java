@@ -19,7 +19,7 @@ import java.util.ArrayList;
  */
 public class NominalEventCoreference {
 	private static String pathToLemmaClasses = "";
-    static final String layer = "terms;srl";
+    static final String layer = "srl";
     static final String name = "vua-nominal-events";
     static final String version = "1.0";
 
