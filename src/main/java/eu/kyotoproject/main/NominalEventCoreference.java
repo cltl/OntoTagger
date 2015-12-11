@@ -132,7 +132,7 @@ public class NominalEventCoreference {
                 corefTargets.add(corefTarget);
                 kafEvent.setSpans(corefTargets);
                 kafEvent.setExternalReferences(kafTerm.getSenseTags());
-                String pId = "pr-nom"+ nPredicates;
+                String pId = "pr"+ nPredicates;
                 kafEvent.setId(pId);
                 kafSaxParser.kafEventArrayList.add(kafEvent);
             }
