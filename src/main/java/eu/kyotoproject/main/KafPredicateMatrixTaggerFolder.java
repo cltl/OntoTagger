@@ -99,8 +99,8 @@ public class KafPredicateMatrixTaggerFolder {
 
             String strBeginDate = eu.kyotoproject.util.DateUtil.createTimestamp();
             String strEndDate = null;
-
-            KafPredicateMatrixTagger.processKafFileWordnetNetSynsets(kafSaxParser, pathToKafFile, pmVersion, resources, selectedMappings);
+            kafSaxParser.parseFile(pathToKafFile);
+            KafPredicateMatrixTagger.processKafFileWordnetNetSynsets(kafSaxParser, pmVersion, resources, selectedMappings);
 
             strEndDate = eu.kyotoproject.util.DateUtil.createTimestamp();
             String host = "";

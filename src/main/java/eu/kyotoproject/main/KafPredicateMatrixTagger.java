@@ -24,15 +24,20 @@ public class KafPredicateMatrixTagger {
         Resources resources = new Resources();
       //  String pathToKafFile = "/Tools/ontotagger-v1.0/naf-example/spinoza-voorbeeld-ukb.xml";
        // String pathToKafFile = "/Users/piek/Desktop/NWR/NWR-SRL/wikinews-nl/files/14369_Airbus_offers_funding_to_search_for_black_boxes_from_Air_France_disaster.ukb.kaf";
-        String pathToKafFile = "/Tools/ontotagger-v1.0/naf-example/89007714_06.tok.alpino.ner.ukb.pm.ht.srl.naf";
-       // String pathToKafFile = "/Users/piek/Desktop/NWR/NWR-SRL/wikinews-nl/files/14369_Airbus_offers_funding_to_search_for_black_boxes_from_Air_France_disaster.ukb.kaf";
-        String pathToMatrixFile = "/Tools/ontotagger-v1.0/resources/PredicateMatrix.v1.1/PredicateMatrix.v1.1.role.nl-1.merged";
-        String pathToGrammaticalVerbsFile = "/Tools/ontotagger-v1.0/resources/grammaticals/Grammatical-words.nl";
-        String pmVersion = "1.1";
+        String pathToKafFile = "";
+        pathToKafFile = "/Tools/nwr-dutch-pipeline/vua-ontotagger-v1.0/nl.demo.naf";
+       // pathToKafFile = "/Users/piek/Desktop/NWR/NWR-SRL/wikinews-nl/files/14369_Airbus_offers_funding_to_search_for_black_boxes_from_Air_France_disaster.ukb.kaf";
+        String pathToMatrixFile = "";
+        pathToMatrixFile = "/Tools/nwr-dutch-pipeline/vua-ontotagger-v1.0/resources/PredicateMatrix.v1.3.txt.role.odwn";
+        String pathToGrammaticalVerbsFile = "";
+        pathToGrammaticalVerbsFile = "/Tools/ontotagger-v1.0/resources/grammaticals/Grammatical-words.nl";
+        String pmVersion = "";
+        pmVersion = "1.1";
         boolean ili = false;
         String pos = "";
         String prefix = "";
-        String key = "odwn-eq";
+        String key = "";
+        key = "odwn-eq";
         String format = "naf";
         String[] selectedMappings = null;
         for (int i = 0; i < args.length; i++) {
@@ -74,10 +79,12 @@ public class KafPredicateMatrixTagger {
         }
         else if (!key.isEmpty()) {
             resources.processMatrixFile(pathToMatrixFile, key, prefix);
+            System.out.println("resources = " + resources.wordNetPredicateMap.size());
         }
         else {
             resources.processMatrixFileWithWordnetLemma(pathToMatrixFile);
         }
+
         if (!pathToGrammaticalVerbsFile.isEmpty()) {
             resources.processGrammaticalWordsFile(pathToGrammaticalVerbsFile);
         }
@@ -85,7 +92,13 @@ public class KafPredicateMatrixTagger {
         String strEndDate = null;
 
         KafSaxParser kafSaxParser = new KafSaxParser();
-        processKafFileWordnetNetSynsets(kafSaxParser, pathToKafFile, pmVersion, resources, selectedMappings);
+        if (pathToKafFile.isEmpty()) {
+            kafSaxParser.parseFile(System.in);
+        }
+        else {
+            kafSaxParser.parseFile(pathToKafFile);
+        }
+        processKafFileWordnetNetSynsets(kafSaxParser, pmVersion, resources, selectedMappings);
 
         strEndDate = eu.kyotoproject.util.DateUtil.createTimestamp();
         String host = "";
@@ -246,8 +259,7 @@ public class KafPredicateMatrixTagger {
         return false;
     }
 
-    static public void processKafFileWordnetNetSynsets (KafSaxParser kafSaxParser, String pathToKafFile, String pmVersion, Resources resources, String[] selectedMappings) {
-        kafSaxParser.parseFile(pathToKafFile);
+    static public void processKafFileWordnetNetSynsets (KafSaxParser kafSaxParser, String pmVersion, Resources resources, String[] selectedMappings) {
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
             KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
             if (resources.grammaticalWords.contains(kafTerm.getLemma())) {
@@ -313,6 +325,9 @@ public class KafPredicateMatrixTagger {
                 }
             }
 
+        }
+        else {
+          //  System.out.println("cannot find senseCode = " + senseCode);
         }
     }
 
