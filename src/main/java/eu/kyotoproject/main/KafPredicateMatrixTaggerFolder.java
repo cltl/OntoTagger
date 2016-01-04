@@ -89,8 +89,8 @@ public class KafPredicateMatrixTaggerFolder {
         if (!pathToGrammaticalVerbsFile.isEmpty()) {
             resources.processGrammaticalWordsFile(pathToGrammaticalVerbsFile);
         }
-        System.out.println("resources.wordNetPredicateMap.size() = " + resources.wordNetPredicateMap.size());
-        System.out.println("resources.grammaticalWords.size() = " + resources.grammaticalWords.size());
+        //System.out.println("resources.wordNetPredicateMap.size() = " + resources.wordNetPredicateMap.size());
+        //System.out.println("resources.grammaticalWords.size() = " + resources.grammaticalWords.size());
         KafSaxParser kafSaxParser = new KafSaxParser();
         ArrayList<String> kafFiles = Util.makeRecursiveFileListAll(pathToKafFolder, fileExtension);
         for (int f = 0; f < kafFiles.size(); f++) {

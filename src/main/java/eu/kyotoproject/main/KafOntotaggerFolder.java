@@ -70,7 +70,7 @@ public class KafOntotaggerFolder {
         ArrayList<String> kafFiles = Util.makeRecursiveFileListAll(pathToKafFolder, fileExtension);
         for (int f = 0; f < kafFiles.size(); f++) {
             String pathToKafFile =  kafFiles.get(f);
-            System.out.println("pathToKafFile = " + pathToKafFile);
+            //System.out.println("pathToKafFile = " + pathToKafFile);
             String strBeginDate = eu.kyotoproject.util.DateUtil.createTimestamp();
             String strEndDate = null;
 

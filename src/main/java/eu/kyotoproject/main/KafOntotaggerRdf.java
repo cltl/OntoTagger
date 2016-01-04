@@ -67,8 +67,8 @@ public class KafOntotaggerRdf {
     public static ArrayList<String> getLemmaParents(String s){
 		ArrayList<String> result = new ArrayList<String>();
 		ArrayList<TreeNode<NodeData>> found = tree.find(s);
-		System.out.println(found.get(0).getData().getLabel());
-		System.out.println(found.size());
+		//System.out.println(found.get(0).getData().getLabel());
+		//System.out.println(found.size());
 		for(int i = 0; i < found.size(); i++){
 			//if finding more than 1 candidate, use null as a seperator in the list. 
 			if(i != 0){ result.add(null); }

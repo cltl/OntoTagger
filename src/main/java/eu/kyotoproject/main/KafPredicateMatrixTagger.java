@@ -79,7 +79,7 @@ public class KafPredicateMatrixTagger {
         }
         else if (!key.isEmpty()) {
             resources.processMatrixFile(pathToMatrixFile, key, prefix);
-            System.out.println("resources = " + resources.wordNetPredicateMap.size());
+           // System.out.println("resources = " + resources.wordNetPredicateMap.size());
         }
         else {
             resources.processMatrixFileWithWordnetLemma(pathToMatrixFile);
