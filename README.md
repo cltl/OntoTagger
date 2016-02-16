@@ -1,5 +1,25 @@
 OntoTagger
 ==========
+SOURCE CODE:
+
+https://github.com/cltl/OntoTagger
+
+The binaries can be built using maven and the pom.xml
+
+> mvn install
+
+REQUIREMENTS
+OntoTagger is developed in Java 1.6 and can run on any platform that supports Java 1.6
+
+LICENSE
+    OntoTagger is free software: you can redistribute it and/or modify
+    it under the terms of the The Apache License, Version 2.0:
+        http://www.apache.org/licenses/LICENSE-2.0.txt.
+
+    OntoTagger is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
 Ontotagger inserts (semantic) labels into KAF representation on the basis of
 lemma or wordnet synset representations of text.
