@@ -4,7 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+<!--
     <groupId>eu.newsreaderproject.ontotagger</groupId>
+-->
+    <groupId>com.github.cltl</groupId>
     <artifactId>ontotagger</artifactId>
     <version>3.0</version>
     <packaging>jar</packaging>
@@ -46,6 +49,10 @@
             <url>http://pipet.sourceforge.net/m2repo</url>
             <layout>default</layout>
         </repository>
+            <repository>
+                <id>jitpack.io</id>
+                <url>https://jitpack.io</url>
+            </repository>
     </repositories>
 
     <!-- specify compiler settings -->
@@ -98,10 +105,15 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.github.cltl</groupId>
+            <artifactId>KafSaxParser</artifactId>
+            <version>3.0</version>
+        </dependency>
+        <!--<dependency>
         <groupId>eu.kyotoproject.KyotoKafSaxParser</groupId>
         <artifactId>KyotoKafSaxParser</artifactId>
         <version>3.0</version>
-    </dependency>
+    </dependency>-->
         <dependency>
             <groupId>org.jdom</groupId>
             <artifactId>jdom</artifactId>
