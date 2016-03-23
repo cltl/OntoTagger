@@ -9,7 +9,7 @@
 -->
     <groupId>com.github.cltl</groupId>
     <artifactId>ontotagger</artifactId>
-    <version>3.0</version>
+    <version>v3.0</version>
     <packaging>jar</packaging>
     <name>OntoTagger</name>
     <description>Reads NewsReader NAF files and adds semantic labels to the term layer based on wordnet synsets or on lemmas.
@@ -96,7 +96,7 @@
         <dependency>
             <groupId>com.github.cltl</groupId>
             <artifactId>KafSaxParser</artifactId>
-            <!--<version>3.0</version>-->
+            <version>v3.0</version>
         </dependency>
         <!--<dependency>
         <groupId>eu.kyotoproject.KyotoKafSaxParser</groupId>
