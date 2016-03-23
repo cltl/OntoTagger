@@ -96,7 +96,7 @@
         <dependency>
             <groupId>com.github.cltl</groupId>
             <artifactId>KafSaxParser</artifactId>
-            <version>3.0</version>
+            <!--<version>3.0</version>-->
         </dependency>
         <!--<dependency>
         <groupId>eu.kyotoproject.KyotoKafSaxParser</groupId>
