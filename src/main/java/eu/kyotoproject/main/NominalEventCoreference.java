@@ -2,13 +2,13 @@ package eu.kyotoproject.main;
 
 import eu.kyotoproject.kaf.*;
 import eu.kyotoproject.util.FrameNetLuReader;
+import org.apache.tools.bzip2.CBZip2InputStream;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Created with IntelliJ IDEA.
@@ -40,7 +40,29 @@ public class NominalEventCoreference {
             }
         }
         FrameNetLuReader frameNetLuReader = new FrameNetLuReader();
-        frameNetLuReader.parseFile(pathToFrameNetLuFile);
+
+        if (pathToFrameNetLuFile.toLowerCase().endsWith(".gz")) {
+            try {
+                InputStream fileStream = new FileInputStream(pathToFrameNetLuFile);
+                InputStream gzipStream = new GZIPInputStream(fileStream);
+                frameNetLuReader.parseFile(gzipStream);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (pathToFrameNetLuFile.toLowerCase().endsWith(".bz2")) {
+            try {
+                InputStream fileStream = new FileInputStream(pathToFrameNetLuFile);
+                InputStream gzipStream = new CBZip2InputStream(fileStream);
+                frameNetLuReader.parseFile(gzipStream);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            frameNetLuReader.parseFile(pathToFrameNetLuFile);
+        }
+
 
         String strBeginDate = eu.kyotoproject.util.DateUtil.createTimestamp();
         String strEndDate = null;
@@ -50,7 +72,27 @@ public class NominalEventCoreference {
             kafSaxParser.parseFile(System.in);
         }
         else {
-            kafSaxParser.parseFile(pathToKafFile);
+            if (pathToKafFile.toLowerCase().endsWith(".gz")) {
+                try {
+                    InputStream fileStream = new FileInputStream(pathToKafFile);
+                    InputStream gzipStream = new GZIPInputStream(fileStream);
+                    kafSaxParser.parseFile(gzipStream);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            else if (pathToKafFile.toLowerCase().endsWith(".bz2")) {
+                try {
+                    InputStream fileStream = new FileInputStream(pathToKafFile);
+                    InputStream gzipStream = new CBZip2InputStream(fileStream);
+                    kafSaxParser.parseFile(gzipStream);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                kafSaxParser.parseFile(pathToKafFile);
+            }
         }
         ArrayList<KafTerm> nominalEvents = new ArrayList<KafTerm>();
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {

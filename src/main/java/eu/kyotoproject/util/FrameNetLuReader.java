@@ -6,9 +6,14 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import javax.xml.parsers.FactoryConfigurationError;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -24,6 +29,52 @@ public class FrameNetLuReader extends DefaultHandler {
     public HashMap<String, ArrayList<String>> lexicalUnitFrameMap;
     private String value = "";
 
+
+    public boolean parseFile(InputSource var1) {
+        try {
+            this.init();
+            SAXParserFactory var2 = SAXParserFactory.newInstance();
+            var2.setValidating(false);
+            SAXParser var3 = var2.newSAXParser();
+            var3.parse(var1, this);
+            return true;
+        } catch (FactoryConfigurationError var4) {
+            var4.printStackTrace();
+        } catch (ParserConfigurationException var5) {
+            var5.printStackTrace();
+        } catch (SAXException var6) {
+            var6.printStackTrace();
+        } catch (IOException var7) {
+            ;
+        }
+
+        return false;
+    }
+
+    public boolean parseFile(File var1) {
+        try {
+            FileReader var2 = new FileReader(var1);
+            InputSource var3 = new InputSource(var2);
+            boolean var4 = this.parseFile(var3);
+            var2.close();
+            return var4;
+        } catch (IOException var5) {
+            var5.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean parseFile(InputStream var1) {
+        InputSource var2 = new InputSource(var1);
+        boolean var3 = this.parseFile(var2);
+        try {
+            var1.close();
+        } catch (IOException var5) {
+            ;
+        }
+
+        return var3;
+    }
     public void parseFile(String filePath) {
         String myerror = "";
         init();
@@ -50,6 +101,9 @@ public class FrameNetLuReader extends DefaultHandler {
            // System.out.println("myerror = " + myerror);
         }
     }//--c
+
+
+
 
     public void init() {
         lexicalUnitFrameMap = new HashMap<String, ArrayList<String>>();

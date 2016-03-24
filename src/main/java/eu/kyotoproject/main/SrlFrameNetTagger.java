@@ -3,13 +3,18 @@ package eu.kyotoproject.main;
 import eu.kyotoproject.kaf.*;
 import eu.kyotoproject.rdf.SenseFrameRoles;
 import eu.kyotoproject.util.GetDominantMapping;
+import org.apache.tools.bzip2.CBZip2InputStream;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Created by piek on 9/8/14.
@@ -94,7 +99,36 @@ public class SrlFrameNetTagger {
         String strEndDate = null;
 
         KafSaxParser kafSaxParser = new KafSaxParser();
-        processSrlLayer(kafSaxParser, pathToKafFile, fns, rnss,ilins,  confidenceThreshold.doubleValue(), frameThreshold.intValue());
+
+        if (pathToKafFile.isEmpty()) {
+            //kafSaxParser.encoding = "UTF-8";
+            kafSaxParser.parseFile(System.in);
+        }
+        else {
+            if (pathToKafFile.toLowerCase().endsWith(".gz")) {
+                try {
+                    InputStream fileStream = new FileInputStream(pathToKafFile);
+                    InputStream gzipStream = new GZIPInputStream(fileStream);
+                    kafSaxParser.parseFile(gzipStream);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            else if (pathToKafFile.toLowerCase().endsWith(".bz2")) {
+                try {
+                    InputStream fileStream = new FileInputStream(pathToKafFile);
+                    InputStream gzipStream = new CBZip2InputStream(fileStream);
+                    kafSaxParser.parseFile(gzipStream);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                kafSaxParser.parseFile(pathToKafFile);
+            }
+        }
+
+        processSrlLayer(kafSaxParser, fns, rnss,ilins,  confidenceThreshold.doubleValue(), frameThreshold.intValue());
 
         strEndDate = eu.kyotoproject.util.DateUtil.createTimestamp();
         String host = "";
@@ -186,18 +220,12 @@ public class SrlFrameNetTagger {
     }
 
     static public void processSrlLayer (KafSaxParser kafSaxParser, 
-                                        String pathToKafFile,
                                         String fns,
                                         String [] rnss,
                                         String ilins,
                                         double confidenceThreshold,
                                         int framethreshold) {
-        if (pathToKafFile.isEmpty()) {
-            kafSaxParser.parseFile(System.in);
-        }
-        else {
-            kafSaxParser.parseFile(pathToKafFile);
-        }
+
         for (int i = 0; i < kafSaxParser.getKafEventArrayList().size(); i++) {
             KafEvent event = kafSaxParser.getKafEventArrayList().get(i);
             for (int j = 0; j < event.getSpanIds().size(); j++) {

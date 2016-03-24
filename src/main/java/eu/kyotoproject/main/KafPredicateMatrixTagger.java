@@ -2,10 +2,15 @@ package eu.kyotoproject.main;
 
 import eu.kyotoproject.kaf.*;
 import eu.kyotoproject.util.Resources;
+import org.apache.tools.bzip2.CBZip2InputStream;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Created with IntelliJ IDEA.
@@ -96,7 +101,28 @@ public class KafPredicateMatrixTagger {
             kafSaxParser.parseFile(System.in);
         }
         else {
-            kafSaxParser.parseFile(pathToKafFile);
+
+            if (pathToKafFile.toLowerCase().endsWith(".gz")) {
+                try {
+                    InputStream fileStream = new FileInputStream(pathToKafFile);
+                    InputStream gzipStream = new GZIPInputStream(fileStream);
+                    kafSaxParser.parseFile(gzipStream);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            else if (pathToKafFile.toLowerCase().endsWith(".bz2")) {
+                try {
+                    InputStream fileStream = new FileInputStream(pathToKafFile);
+                    InputStream gzipStream = new CBZip2InputStream(fileStream);
+                    kafSaxParser.parseFile(gzipStream);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                kafSaxParser.parseFile(pathToKafFile);
+            }
         }
         processKafFileWordnetNetSynsets(kafSaxParser, pmVersion, resources, selectedMappings);
 
