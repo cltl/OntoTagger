@@ -4,9 +4,12 @@ SOURCE CODE:
 
 https://github.com/cltl/OntoTagger
 
-The binaries can be built using maven and the pom.xml
+Installation:
+1. git clone https://github.com/cltl/OntoTagger.git
+2. cd OntoTagger
+3. install.sh
 
-> mvn install
+Installation through apache-maven-2.2.1 on the basis of the pom.xml
 
 REQUIREMENTS
 OntoTagger is developed in Java 1.6 and can run on any platform that supports Java 1.6

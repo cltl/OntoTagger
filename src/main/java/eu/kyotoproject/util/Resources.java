@@ -1,9 +1,11 @@
 package eu.kyotoproject.util;
 
 import eu.kyotoproject.kaf.KafSense;
+import org.apache.tools.bzip2.CBZip2InputStream;
 
 import java.io.*;
 import java.util.*;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,6 +33,38 @@ public class Resources {
         ontologyOntologyMap = new HashMap<String, ArrayList<String>>();
         relationArrayList = new ArrayList<String>();
     }
+
+
+    static InputStream getStreamFromFile (String pathToFile) {
+        if (pathToFile.toLowerCase().endsWith(".gz")) {
+            try {
+                InputStream fileStream = new FileInputStream(pathToFile);
+                InputStream gzipStream = new GZIPInputStream(fileStream);
+                return gzipStream;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (pathToFile.toLowerCase().endsWith(".bz2")) {
+            try {
+                InputStream fileStream = new FileInputStream(pathToFile);
+                InputStream gzipStream = new CBZip2InputStream(fileStream);
+                return gzipStream;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            try {
+                InputStream fileStream = new FileInputStream(pathToFile);
+                return fileStream;
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
 
     static public void main (String[] args) {
         try {
@@ -143,7 +177,8 @@ public class Resources {
 
             //eng-30-15294607-n sc_subClassOf Kyoto#time_period__period_of_time__period-eng-3.0-15113229-n
             String [] headers = null;
-            FileInputStream fis = new FileInputStream(file);
+            //InputStream fis = new FileInputStream(file);
+            InputStream fis = getStreamFromFile(file);
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader in = new BufferedReader(isr);
             String inputLine = "";
@@ -201,7 +236,8 @@ vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:01 
             //vn:comprehend-87.2 vn:87.2 vn:comprehend-87.2-1 vn:87.2-1 vn:apprehend wn:apprehend%2:31:00 vn:Stimulus fn:Grasp fn:NULL fn:NULL pb:NULL pb:NULL
 
             String [] headers = null;
-            FileInputStream fis = new FileInputStream(file);
+            //InputStream fis = new FileInputStream(file);
+            InputStream fis = getStreamFromFile(file);
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader in = new BufferedReader(isr);
             String inputLine = "";
@@ -305,7 +341,8 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
 
             */
             String [] headers = null;
-            FileInputStream fis = new FileInputStream(file);
+            //InputStream fis = new FileInputStream(file);
+            InputStream fis = getStreamFromFile(file);
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader in = new BufferedReader(isr);
             String inputLine = "";
@@ -423,7 +460,8 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
 vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:02 vn:Attribute fn:NULL fn:NULL fn:NULL pb:misinterpret.01 pb:2 mcr:ili-30-00619869-v mcr:factotum mcr:Communication mcr:cognition
 
             */
-            FileInputStream fis = new FileInputStream(file);
+            //InputStream fis = new FileInputStream(file);
+            InputStream fis = getStreamFromFile(file);
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader in = new BufferedReader(isr);
             String inputLine = "";

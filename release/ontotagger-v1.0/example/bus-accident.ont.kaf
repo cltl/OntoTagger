@@ -1,8 +1,0 @@
-pathToKafFile = /Code/vu/kyotoproject/ontotagger/release/ontotagger-v1.0/scripts/../example/bus-accident.ont.dep.kaf
-pathToKafFile = /Code/vu/kyotoproject/ontotagger/release/ontotagger-v1.0/scripts/../example/bus-accident.ont.kaf
-last value = 
-  
-pathToKafFile = /Code/vu/kyotoproject/ontotagger/release/ontotagger-v1.0/scripts/../example/bus-accident.vu_ukb_en.wsd.ont.kaf
-pathToKafFile = /Code/vu/kyotoproject/ontotagger/release/ontotagger-v1.0/scripts/../example/Novotel_Amsterdam_City.2.en.vu_stanford_en.kaf
-pathToKafFile = /Code/vu/kyotoproject/ontotagger/release/ontotagger-v1.0/scripts/../example/Novotel_Amsterdam_City.2.en.vu_ukb_en.wsd.kaf
-pathToKafFile = /Code/vu/kyotoproject/ontotagger/release/ontotagger-v1.0/scripts/../example/Novotel_Amsterdam_City.2.en.vu_ukb_en.wsd.ont.kaf

@@ -5,10 +5,15 @@ import eu.kyotoproject.kaf.KafSense;
 import eu.kyotoproject.kaf.KafTerm;
 import eu.kyotoproject.kaf.LP;
 import eu.kyotoproject.util.Resources;
+import org.apache.tools.bzip2.CBZip2InputStream;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Created with IntelliJ IDEA.
@@ -63,7 +68,36 @@ public class KafOntotagger {
         String strEndDate = null;
 
         KafSaxParser kafSaxParser = new KafSaxParser();
-        kafSaxParser.parseFile(pathToKafFile);
+
+
+        if (pathToKafFile.isEmpty()) {
+            //kafSaxParser.encoding = "UTF-8";
+            kafSaxParser.parseFile(System.in);
+        }
+        else {
+            if (pathToKafFile.toLowerCase().endsWith(".gz")) {
+                try {
+                    InputStream fileStream = new FileInputStream(pathToKafFile);
+                    InputStream gzipStream = new GZIPInputStream(fileStream);
+                    kafSaxParser.parseFile(gzipStream);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            else if (pathToKafFile.toLowerCase().endsWith(".bz2")) {
+                try {
+                    InputStream fileStream = new FileInputStream(pathToKafFile);
+                    InputStream gzipStream = new CBZip2InputStream(fileStream);
+                    kafSaxParser.parseFile(gzipStream);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                kafSaxParser.parseFile(pathToKafFile);
+            }
+        }
+
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
             KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
             for (int j = 0; j < kafTerm.getSenseTags().size(); j++) {

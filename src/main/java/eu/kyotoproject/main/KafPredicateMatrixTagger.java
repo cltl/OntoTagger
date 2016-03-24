@@ -67,7 +67,7 @@ public class KafPredicateMatrixTagger {
                 pmVersion = args[i+1];
             }
             else if ((arg.equalsIgnoreCase("--key")) && (args.length>(i+1))) {
-                pmVersion = args[i+1];
+                key = args[i+1];
             }
             else if ((arg.equalsIgnoreCase("--ignore-prefix")) && (args.length>(i+1))) {
                 prefix = args[i+1];

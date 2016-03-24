@@ -46,7 +46,7 @@ public class SrlFrameNetTagger {
         String pathToKafFile = "";
         Double confidenceThreshold = -1.0;
         Integer frameThreshold = -1;
-        String format = "";
+        String format = "naf";
 
 /*
         fns = "fn:";
@@ -225,7 +225,6 @@ public class SrlFrameNetTagger {
                                         String ilins,
                                         double confidenceThreshold,
                                         int framethreshold) {
-
         for (int i = 0; i < kafSaxParser.getKafEventArrayList().size(); i++) {
             KafEvent event = kafSaxParser.getKafEventArrayList().get(i);
             for (int j = 0; j < event.getSpanIds().size(); j++) {
@@ -235,7 +234,7 @@ public class SrlFrameNetTagger {
                 if (kafTerm!=null) {
                     HashMap<String, ArrayList<SenseFrameRoles>> frameMap = GetDominantMapping.getFrameMap(kafTerm, confidenceThreshold, fns, rnss, ilins);
                     if (frameMap.size()>0) {
-                       // System.out.println("frameMap.size() = " + frameMap.size());
+                        //System.out.println("frameMap.size() = " + frameMap.size());
                         double topscore = GetDominantMapping.getTopScore(frameMap);
                         Set keySet = frameMap.keySet();
                         Iterator<String> keys = keySet.iterator();
