@@ -2,7 +2,7 @@
 
 # define the location of the install scipt
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-PARENT="$( cd $ROOT && cd .. && pwd)"
+PARENT="$( cd $DIR && cd .. && pwd)"
 
 echo "#1. compiling the library from source code and dependencies"
 mvn install
