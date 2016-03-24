@@ -7,7 +7,8 @@ https://github.com/cltl/OntoTagger
 Installation:
 1. git clone https://github.com/cltl/OntoTagger.git
 2. cd OntoTagger
-3. install.sh
+3. chmod +wrx install.sh
+4. install.sh
 
 Installation through apache-maven-2.2.1 on the basis of the pom.xml
 
