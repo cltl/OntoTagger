@@ -1,5 +1,11 @@
 OntoTagger
 ==========
+version 3.0
+Copyright: VU University Amsterdam, Piek Vossen
+email: piek.vossen@vu.nl
+website: www.newsreader-project.eu
+website: cltl.nl
+
 SOURCE CODE:
 
 https://github.com/cltl/OntoTagger
@@ -8,7 +14,7 @@ Installation:
 1. git clone https://github.com/cltl/OntoTagger.git
 2. cd OntoTagger
 3. chmod +wrx install.sh
-4. install.sh
+4. ./install.sh
 
 Installation through apache-maven-2.2.1 on the basis of the pom.xml
 
@@ -25,10 +31,49 @@ LICENSE
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-Ontotagger inserts (semantic) labels into KAF representation on the basis of
-lemma or wordnet synset representations of text.
+DESCRIPTION
 
-Various functions are provided:
+Ontotagger is package with various functions to insert semantic tags tyo elements in NAF.
+The input is a NAF stream and the result is a NAF output stream with enrinched layers.
+The main functions are:
+
+1. Insert PredicateMatrix into the term layer with WSD output (script predicate-matrix-tagger.sh)
+
+The predicate-matrix-tagger.sh script reads a NAF file and adds the PredicateMatrix mappings to each sense in the term layer.
+The mappings are read from the PredicateMatrix file that should be installed as part of the vua-resources package.
+Example call:
+
+cat ../examples/naf.xml | ./predicate-matrix-tagger.sh
+
+Requires a term layer with wordnet synsets.
+
+2. Adding FrameNet and other PredicateMatrix mappings to the SRL layer on the basis of mapping relations (script: srl-framenet-tagger.sh)
+The srl-framenet-tagger.sh script reads a NAF input stream with a SRL layer and PredicateMatrix mappings added to the term layer.
+It will add FrameNet frames from the term layer to the predicate in the SRL layer and also try to resolve the role mappings for FrameNet elements. 
+In addition to Framenet frames and elements, also ESO types and roles are mapped.
+Example call:
+
+cat ../examples/naf.xml | ./srl-framenet-tagger.sh.sh
+
+Requires a term layer with PredicateMatrix data added to the term layer and a SRL layer.
+
+3. Detecting nominal events (script: nominal-event.sh)
+
+The nominal-event.sh script checks the term layer for nouns that can have event meaning according to the nl-luIndex.xml file.
+The script requires the nl-luIndex.xml to be present and to be installed as part of the vua-resources package.
+In the nl-luIndex.xml file, we provided mappings from FrameNet frames to Dutch nouns and verbs. If a nominal term is in this file,
+the program adds the FrameNet frames and adds the term as a predicate to the SRL layer.
+
+Example call:
+
+cat ../examples/naf.xml | ./nominal-events.sh
+
+Requires the presence of a SRL layer and a term layer.
+
+These functions have been used mainly within the Dutch NewsReader pipeline.
+
+=====================================
+Some older functions that may still work: 
 
 1. tag terms with wordnet synsets with base concepts and/or ontology mappings
 2. the same as 1. for a whole folder of KAF/NAF files
@@ -321,3 +366,4 @@ Example
         </externalRef>
       </externalReferences>
     </term>
+    
