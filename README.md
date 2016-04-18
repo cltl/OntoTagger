@@ -1,27 +1,32 @@
 OntoTagger
 ==========
-version 3.0
-Copyright: VU University Amsterdam, Piek Vossen
-email: piek.vossen@vu.nl
-website: www.newsreader-project.eu
-website: cltl.nl
 
-SOURCE CODE:
+```
+Version:   3.0
+Copyright: VU University Amsterdam, Piek Vossen
+email:     piek.vossen@vu.nl
+website:   www.newsreader-project.eu
+website:   cltl.nl
+```
+
+## SOURCE CODE:
 
 https://github.com/cltl/OntoTagger
 
-Installation:
-1. git clone https://github.com/cltl/OntoTagger.git
-2. cd OntoTagger
-3. chmod +wrx install.sh
-4. ./install.sh
+## Installation:
+ 1. git clone https://github.com/cltl/OntoTagger.git
+ 2. cd OntoTagger
+ 3. chmod +wrx install.sh
+ 4. ./install.sh
 
 Installation through apache-maven-2.2.1 on the basis of the pom.xml
 
-REQUIREMENTS
+## REQUIREMENTS
+
 OntoTagger is developed in Java 1.6 and can run on any platform that supports Java 1.6
 
-LICENSE
+## LICENSE
+
     OntoTagger is free software: you can redistribute it and/or modify
     it under the terms of the The Apache License, Version 2.0:
         http://www.apache.org/licenses/LICENSE-2.0.txt.
@@ -31,7 +36,7 @@ LICENSE
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-DESCRIPTION
+## DESCRIPTION
 
 Ontotagger is package with various functions to insert semantic tags tyo elements in NAF.
 The input is a NAF stream and the result is a NAF output stream with enrinched layers.
