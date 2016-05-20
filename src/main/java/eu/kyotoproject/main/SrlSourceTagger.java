@@ -83,6 +83,7 @@ public class SrlSourceTagger {
             ArrayList<String> spandIds = kafEvent.getSpanIds();
             String lemma = kafSaxParser.getLemma(spandIds);
             if (predicates.contains(lemma)) {
+               // System.out.println("lemma = " + lemma);
                 KafSense kafSense = new KafSense();
                 kafSense.setResource("FrameNet");
                 kafSense.setSensecode("Communication");
@@ -94,11 +95,20 @@ public class SrlSourceTagger {
                 roleSense.setSource("Communication@Message");
                 for (int j = 0; j < kafEvent.getParticipants().size(); j++) {
                     KafParticipant kafParticipant = kafEvent.getParticipants().get(j);
+                    kafParticipant.setTokenStrings(kafSaxParser);
                     if (kafParticipant.getRole().equalsIgnoreCase("#")) {
                         kafParticipant.addExternalReferences(roleSense);
                     }
-                    else if (kafParticipant.getRole().equalsIgnoreCase("Arg1")) {
+                    else if (kafParticipant.getRole().equalsIgnoreCase("Arg1") || kafParticipant.getRole().equalsIgnoreCase("A1")) {
                         kafParticipant.addExternalReferences(roleSense);
+                    }
+                    else if (!kafParticipant.getRole().equalsIgnoreCase("Arg0") && !kafParticipant.getRole().equalsIgnoreCase("A0")) {
+                        if (kafParticipant.getSpanIds().size()>3) {
+                           // System.out.println("kafParticipant.getRole() = " + kafParticipant.getRole());
+                            // System.out.println("kafParticipant.getSpanIds() = " + kafParticipant.getSpanIds());
+                           // System.out.println("kafParticipant.getTokenString() = " + kafParticipant.getTokenString());
+                            kafParticipant.addExternalReferences(roleSense);
+                        }
                     }
                 }
             }
