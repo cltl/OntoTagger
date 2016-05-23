@@ -1,9 +1,6 @@
 package eu.kyotoproject.main;
 
-import eu.kyotoproject.kaf.KafEvent;
-import eu.kyotoproject.kaf.KafParticipant;
-import eu.kyotoproject.kaf.KafSaxParser;
-import eu.kyotoproject.kaf.KafSense;
+import eu.kyotoproject.kaf.*;
 import eu.kyotoproject.util.FileProcessor;
 import eu.kyotoproject.util.FixEventCoreferences;
 
@@ -11,6 +8,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -19,6 +18,9 @@ import java.util.Vector;
  */
 public class SrlSourceTagger {
 
+    static final String layer = "srl";
+    static final String name = "vua-source-srl-tagger";
+    static final String version = "1.0";
 
     static public void main (String[] args) {
         KafSaxParser kafSaxParser = new KafSaxParser();
@@ -26,6 +28,9 @@ public class SrlSourceTagger {
         String pathToSourceLemmas = "";
         String extension = "";
         Vector<String> predicates = null;
+
+        String strBeginDate = eu.kyotoproject.util.DateUtil.createTimestamp();
+        String strEndDate = null;
 
         pathToFile = "/Users/piek/Desktop/NWR-INC/dasym/test1/test.naf";
         for (int i = 0; i < args.length; i++) {
@@ -44,6 +49,17 @@ public class SrlSourceTagger {
         if (pathToFile.equalsIgnoreCase("stream")) {
             kafSaxParser.parseFile(System.in);
             sourceTag(kafSaxParser, predicates);
+
+            strEndDate = eu.kyotoproject.util.DateUtil.createTimestamp();
+            String host = "";
+            try {
+                host = InetAddress.getLocalHost().getHostName();
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+            LP lp = new LP(name,version, strBeginDate, strBeginDate, strEndDate, host);
+            kafSaxParser.getKafMetaData().addLayer(layer, lp);
+
             kafSaxParser.writeNafToStream(System.out);
         }
         else {
@@ -54,6 +70,17 @@ public class SrlSourceTagger {
                     File nextFile = files.get(i);
                     kafSaxParser.parseFile(nextFile);
                     sourceTag(kafSaxParser, predicates);
+
+                    strEndDate = eu.kyotoproject.util.DateUtil.createTimestamp();
+                    String host = "";
+                    try {
+                        host = InetAddress.getLocalHost().getHostName();
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    }
+                    LP lp = new LP(name,version, strBeginDate, strBeginDate, strEndDate, host);
+                    kafSaxParser.getKafMetaData().addLayer(layer, lp);
+
                     try {
                         OutputStream fos = new FileOutputStream(nextFile);
                         kafSaxParser.writeNafToStream(fos);
@@ -66,6 +93,17 @@ public class SrlSourceTagger {
             else {
                 kafSaxParser.parseFile(file);
                 sourceTag(kafSaxParser, predicates);
+
+                strEndDate = eu.kyotoproject.util.DateUtil.createTimestamp();
+                String host = "";
+                try {
+                    host = InetAddress.getLocalHost().getHostName();
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                }
+                LP lp = new LP(name,version, strBeginDate, strBeginDate, strEndDate, host);
+                kafSaxParser.getKafMetaData().addLayer(layer, lp);
+
                 try {
                     OutputStream fos = new FileOutputStream(file);
                     kafSaxParser.writeNafToStream(fos);

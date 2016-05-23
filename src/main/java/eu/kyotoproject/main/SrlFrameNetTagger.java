@@ -35,7 +35,7 @@ public class SrlFrameNetTagger {
      </externalRef>
      */
 
-    static final String layer = "terms";
+    static final String layer = "srl";
     static final String name = "vua-framenet-srl-tagger";
     static final String version = "1.0";
 
