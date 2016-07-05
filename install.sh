@@ -9,7 +9,7 @@ echo "#1. compiling the library from source code and dependencies"
 mvn install
 echo "#2. moving binary to lib folder"
 mkdir -p $DIR/lib
-mv "$DIR/target/ontotagger-v3.0-jar-with-dependencies.jar" "$DIR/lib"
+mv ${DIR}/target/ontotagger-*-jar-with-dependencies.jar "$DIR/lib"
 echo "#3. installing the vua-resources"
 cd "$PARENT"
 git clone https://github.com/cltl/vua-resources.git
