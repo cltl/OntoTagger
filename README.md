@@ -10,7 +10,7 @@ SOURCE CODE:
 
 https://github.com/cltl/OntoTagger
 
-Installation:
+INSTALLATION:
 1. git clone https://github.com/cltl/OntoTagger.git
 2. cd OntoTagger
 3. chmod +wrx install.sh
