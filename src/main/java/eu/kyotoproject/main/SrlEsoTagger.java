@@ -116,13 +116,14 @@ public class SrlEsoTagger {
             ArrayList<String> spandIds = kafEvent.getSpanIds();
             String lemma = kafSaxParser.getLemma(spandIds);
             if (esoMap.containsKey(lemma)) {
-                // System.out.println("lemma = " + lemma);
                 String type = esoMap.get(lemma);
                 KafSense kafSense = new KafSense();
                 kafSense.setResource("eso");
                 kafSense.setSensecode(type);
                 kafSense.setSource("vua-source-tagger");
                 kafEvent.addExternalReferences(kafSense);
+                //System.out.println("lemma = " + lemma);
+                //System.out.println("type = " + type);
             }
         }
     }
