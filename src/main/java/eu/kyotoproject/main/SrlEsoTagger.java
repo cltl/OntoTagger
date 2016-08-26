@@ -116,6 +116,7 @@ public class SrlEsoTagger {
             ArrayList<String> spandIds = kafEvent.getSpanIds();
             String lemma = kafSaxParser.getLemma(spandIds);
             if (esoMap.containsKey(lemma)) {
+                kafEvent.setExternalReferences(new ArrayList<KafSense>()); /// re-initialize to remove wrong interpretations
                 String type = esoMap.get(lemma);
                 KafSense kafSense = new KafSense();
                 kafSense.setResource("eso");
