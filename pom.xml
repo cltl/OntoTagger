@@ -92,7 +92,7 @@
         <dependency>
             <groupId>com.github.cltl</groupId>
             <artifactId>KafSaxParser</artifactId>
-            <version>v3.1.1</version>
+            <version>v3.1.2</version>
         </dependency>
         <dependency>
             <groupId>org.jdom</groupId>
