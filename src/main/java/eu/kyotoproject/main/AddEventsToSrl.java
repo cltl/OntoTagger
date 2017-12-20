@@ -23,29 +23,37 @@ public class AddEventsToSrl {
     static final String name = "vua-add-events";
     static final String version = "1.0";
 
+    static String testParameters = "--naf-folder /Users/piek/Desktop/Semeval2018/trial_data_final/NAFDONE --extension .naf --event-file /Users/piek/Desktop/SemEval2018/scripts/trial_vocabulary";
+
     static public void main (String[] args) {
         String pathToKafFile = "";
         String pathToKafFolder = "";
         String extension = "";
         String pathToEventFile = "";
-
+        args = testParameters.split(" ");
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if ((arg.equalsIgnoreCase("--naf-file")) && (args.length > (i + 1))) {
                 pathToKafFile = args[i + 1];
-            } else if (arg.equals("--event-file") && args.length > i + 1) {
+            }
+            else if (arg.equals("--event-file") && args.length > (i + 1)) {
                 pathToEventFile = args[i + 1];
-            } else if (arg.equals("--naf-folder") && args.length > i + 1) {
-                pathToEventFile = args[i + 1];
-            } else if (arg.equals("--extension") && args.length > i + 1) {
+            }
+            else if (arg.equals("--naf-folder") && args.length > (i + 1))  {
+                pathToKafFolder = args[i + 1];
+            }
+            else if (arg.equals("--extension") && args.length > (i + 1))  {
                 extension = args[i + 1];
             }
         }
 
         ArrayList<String> events = Util.ReadFileToStringArrayList(pathToEventFile);
-
+        //System.out.println("events.size() = " + events.size());
+        //System.out.println("pathToKafFolder = " + pathToKafFolder);
+        //System.out.println("extension = " + extension);
 
         if (pathToKafFile.isEmpty() && pathToKafFolder.isEmpty()) {
+            //System.out.println("Waiting for stream");
             String strBeginDate = eu.kyotoproject.util.DateUtil.createTimestamp();
             String strEndDate = null;
             KafSaxParser kafSaxParser = new KafSaxParser();
@@ -62,17 +70,16 @@ public class AddEventsToSrl {
             kafSaxParser.getKafMetaData().addLayer(layer, lp);
             kafSaxParser.writeNafToStream(System.out);
         }
-        else {
-            if (!pathToKafFile.isEmpty()) {
+        else if (!pathToKafFile.isEmpty()) {
                 processNafFile(pathToKafFile, events);
-            }
-            else if (!pathToKafFolder.isEmpty()) {
-                ArrayList<String> files = Util.makeRecursiveFileListAll(pathToKafFolder, extension);
+        }
+        else if (!pathToKafFolder.isEmpty()) {
+                ArrayList<String> files = Util.makeFlatFileList(pathToKafFolder, extension);
                 for (int i = 0; i < files.size(); i++) {
                     String filePath = files.get(i);
+                    //System.out.println("filePath = " + filePath);
                     processNafFile(filePath, events);
                 }
-            }
         }
     }
 
@@ -149,6 +156,7 @@ public class AddEventsToSrl {
                 nPredicates++;
                // System.out.println("kafTerm.getId() = " + kafTerm.getTid());
                 KafEvent kafEvent = new KafEvent();
+                kafEvent.setStatus("new");
                 ArrayList<CorefTarget> corefTargets = new ArrayList<CorefTarget>();
                 CorefTarget corefTarget = new CorefTarget();
                 corefTarget.setId(kafTerm.getTid());

@@ -41,6 +41,22 @@ public class Util {
         return acceptedFileList;
     }
 
+    static public ArrayList<String> makeFlatFileList(String inputPath, String extension) {
+        ArrayList<String> acceptedFileList = new ArrayList<String>();
+        ArrayList<String>  nestedFileList = new ArrayList<String>();
+        File[] theFileList = null;
+        File lF = new File(inputPath);
+        if ((lF.canRead()) && lF.isDirectory()) {
+            theFileList = lF.listFiles();
+            for (int i = 0; i < theFileList.length; i++) {
+                if (theFileList[i].getName().endsWith(extension)) {
+                    acceptedFileList.add(theFileList[i].getAbsolutePath());
+                }
+            }
+        }
+        return acceptedFileList;
+    }
+
     static public HashMap<String, ArrayList<String>> ReadFileToStringHashMap(String separator, String fileName) {
         HashMap<String, ArrayList<String>> lineHashMap = new HashMap<String, ArrayList<String>>();
         if (new File (fileName).exists() ) {
