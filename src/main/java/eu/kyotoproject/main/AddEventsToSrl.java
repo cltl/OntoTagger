@@ -77,7 +77,7 @@ public class AddEventsToSrl {
                 ArrayList<String> files = Util.makeFlatFileList(pathToKafFolder, extension);
                 for (int i = 0; i < files.size(); i++) {
                     String filePath = files.get(i);
-                    //System.out.println("filePath = " + filePath);
+                    System.out.println("filePath = " + filePath);
                     processNafFile(filePath, events);
                 }
         }
