@@ -69,4 +69,26 @@ public class Util {
         }
         return lineHashMap;
     }
+
+    static public ArrayList<String> ReadFileToStringArrayList(String fileName) {
+        ArrayList<String> list = new ArrayList<String>();
+        if (new File (fileName).exists() ) {
+            try {
+                FileInputStream fis = new FileInputStream(fileName);
+                InputStreamReader isr = new InputStreamReader(fis);
+                BufferedReader in = new BufferedReader(isr);
+                String inputLine;
+                while (in.ready()&&(inputLine = in.readLine()) != null) {
+                    //System.out.println(inputLine);
+                    if (inputLine.trim().length()>0) {
+                        list.add(inputLine);
+                    }
+                }
+                in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return list;
+    }
 }
