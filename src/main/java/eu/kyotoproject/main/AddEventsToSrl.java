@@ -23,7 +23,7 @@ public class AddEventsToSrl {
     static final String name = "vua-add-events";
     static final String version = "1.0";
 
-    static String testParameters = "--naf-folder /Users/piek/Desktop/Semeval2018/trial_data_final/NAFDONE --extension .naf --event-file /Users/piek/Desktop/SemEval2018/scripts/trial_vocabulary";
+    static String testParameters = "--naf-folder /Users/piek/Desktop/Semeval2018/test_data/NAFOUT --extension .naf --event-file /Users/piek/Desktop/SemEval2018/scripts/trial_vocabulary";
 
     static public void main (String[] args) {
         String pathToKafFile = "";
@@ -33,17 +33,17 @@ public class AddEventsToSrl {
         args = testParameters.split(" ");
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
-            if ((arg.equalsIgnoreCase("--naf-file")) && (args.length > (i + 1))) {
+            if (arg.equalsIgnoreCase("--naf-file") && args.length > (i + 1)) {
                 pathToKafFile = args[i + 1];
             }
-            else if (arg.equals("--event-file") && args.length > (i + 1)) {
-                pathToEventFile = args[i + 1];
-            }
-            else if (arg.equals("--naf-folder") && args.length > (i + 1))  {
+            else if (arg.equalsIgnoreCase("--naf-folder") && args.length > (i + 1))  {
                 pathToKafFolder = args[i + 1];
             }
-            else if (arg.equals("--extension") && args.length > (i + 1))  {
+            else if (arg.equalsIgnoreCase("--extension") && args.length > (i + 1))  {
                 extension = args[i + 1];
+            }
+            else if (arg.equalsIgnoreCase("--event-file") && args.length > (i + 1)) {
+                pathToEventFile = args[i + 1];
             }
         }
 
@@ -77,7 +77,6 @@ public class AddEventsToSrl {
                 ArrayList<String> files = Util.makeFlatFileList(pathToKafFolder, extension);
                 for (int i = 0; i < files.size(); i++) {
                     String filePath = files.get(i);
-                    System.out.println("filePath = " + filePath);
                     processNafFile(filePath, events);
                 }
         }
@@ -109,7 +108,7 @@ public class AddEventsToSrl {
         else {
             kafSaxParser.parseFile(pathToKafFile);
         }
-
+        System.out.println("pathToFile = " + pathToKafFile);
         try {
             process(kafSaxParser, events);
             strEndDate = eu.kyotoproject.util.DateUtil.createTimestamp();
@@ -133,7 +132,7 @@ public class AddEventsToSrl {
         ArrayList<KafTerm> newEvents = new ArrayList<KafTerm>();
         for (int i = 0; i < kafSaxParser.getKafTerms().size(); i++) {
             KafTerm kafTerm = kafSaxParser.getKafTerms().get(i);
-            if (events.contains(kafTerm.getLemma())) {
+            if (events.contains(kafTerm.getLemma().toLowerCase())) {
                 newEvents.add(kafTerm);
             }
         }

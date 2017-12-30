@@ -98,7 +98,7 @@ public class Util {
                     //System.out.println(inputLine);
                     if (inputLine.trim().length()>0) {
                         String [] fields = inputLine.split("\t");
-                        list.add(fields[0]); //// we ignore any labels of the first column
+                        list.add(fields[0].toLowerCase()); //// we ignore any labels of the first column
                     }
                 }
                 in.close();
