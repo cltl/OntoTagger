@@ -97,7 +97,8 @@ public class Util {
                 while (in.ready()&&(inputLine = in.readLine()) != null) {
                     //System.out.println(inputLine);
                     if (inputLine.trim().length()>0) {
-                        list.add(inputLine);
+                        String [] fields = inputLine.split("\t");
+                        list.add(fields[0]); //// we ignore any labels of the first column
                     }
                 }
                 in.close();
