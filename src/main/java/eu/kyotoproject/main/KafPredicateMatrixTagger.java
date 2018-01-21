@@ -278,7 +278,7 @@ public class KafPredicateMatrixTagger {
         }
         for (int l = 0; l < mappings.length; l++) {
             String selectedMapping = mappings[l];
-            if (m.toLowerCase().startsWith(selectedMapping.toLowerCase())) {
+            if (m.equalsIgnoreCase(selectedMapping)) {
                 return true;
             }
         }
@@ -316,6 +316,32 @@ public class KafPredicateMatrixTagger {
             for (int j = 0; j < kafCoreferenceSet.getExternalReferences().size(); j++) {
                 KafSense kafSense = kafCoreferenceSet.getExternalReferences().get(j);
                 mappSense(resources, kafSense, pmVersion, selectedMappings);
+            }
+        }
+    }
+
+    static public void processExtendCorefForWordnetNetSynsets (KafSaxParser kafSaxParser, String pmVersion, Resources resources, String[] selectedMappings) {
+        for (int i = 0; i < kafSaxParser.kafCorefenceArrayList.size(); i++) {
+            KafCoreferenceSet kafCoreferenceSet = kafSaxParser.kafCorefenceArrayList.get(i);
+            ArrayList<KafSense> concepts = new ArrayList<KafSense>();
+            for (int j = 0; j < kafCoreferenceSet.getExternalReferences().size(); j++) {
+                 KafSense kafSense = kafCoreferenceSet.getExternalReferences().get(j);
+                ArrayList<KafSense> myconcepts = addSense(resources, kafSense, pmVersion, selectedMappings);
+                for (int k = 0; k < myconcepts.size(); k++) {
+                    KafSense sense = myconcepts.get(k);
+                    boolean match = false;
+                    for (int l = 0; l < concepts.size(); l++) {
+                        KafSense kafSense1 = concepts.get(l);
+                        if (sense.getSensecode().equals(kafSense1.getSensecode())) {
+                            match = true; break;
+                        }
+                    }
+                    if (!match) concepts.add(sense);
+                }
+            }
+            for (int j = 0; j < concepts.size(); j++) {
+                KafSense kafSense = concepts.get(j);
+                kafCoreferenceSet.addExternalReferences(kafSense);
             }
         }
     }
@@ -365,6 +391,47 @@ public class KafPredicateMatrixTagger {
         else {
           //  System.out.println("cannot find senseCode = " + senseCode);
         }
+    }
+
+    static ArrayList<KafSense> addSense (Resources resources, KafSense givenKafSense, String pmVersion, String[] selectedMappings) {
+        ArrayList<KafSense> concepts = new ArrayList<KafSense>();
+
+        String senseCode = givenKafSense.getSensecode();
+        if (!resources.wordNetPredicateMap.containsKey(givenKafSense.getSensecode())) {
+            if (senseCode.startsWith("nld-")) {
+                int idx = senseCode.indexOf("_"); //nld-21-d_v-3939-v
+                if (idx>-1) {
+                    senseCode = senseCode.substring(idx-1);  //d_v-3939-v
+                }
+            }
+        }
+        if (resources.wordNetPredicateMap.containsKey(senseCode)) {
+            ArrayList<String> coveredMappings = new ArrayList<String>();
+            ArrayList<ArrayList<String>> mappings = resources.wordNetPredicateMap.get(senseCode);
+            for (int m = 0; m < mappings.size(); m++) {
+                ArrayList<String> mapping =  mappings.get(m);
+                for (int k = 1; k < mapping.size(); k++) {
+                    String s = mapping.get(k);
+                    int idx = s.indexOf(":");
+                    String resource = s;
+                    if (idx > -1) {
+                        resource = s.substring(0, idx);
+                    }
+                    if (checkMappings(selectedMappings, resource) && !coveredMappings.contains(resource)) {
+                        coveredMappings.add(resource); /// prevent multiple fields that share prefix, take first
+                        KafSense child = new KafSense();
+                        child.setResource(resource);
+                        child.setSensecode(s);
+                        concepts.add(child);
+                    }
+                }
+            }
+
+        }
+        else {
+          //  System.out.println("cannot find senseCode = " + senseCode);
+        }
+        return concepts;
     }
 
 }

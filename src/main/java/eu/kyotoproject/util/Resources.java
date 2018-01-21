@@ -249,6 +249,9 @@ vn:say-37.7 vn:37.7 vn:say-37.7-1 vn:37.7-1 vn:articulate wn:articulate%2:32:01 
                         continue;
                     }*/
                     String[] fields = inputLine.split(" ");
+                    if (fields.length==1) {
+                        fields = inputLine.split("\t");
+                    }
                     //System.out.println("fields = " + fields);
                     senseKey = "";
                     lemma= "";
@@ -354,6 +357,9 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
             while (in.ready()&&(inputLine = in.readLine()) != null) {
                 if (inputLine.trim().length()>0) {
                     String[] fields = inputLine.split(" ");
+                    if (fields.length==1) {
+                        fields = inputLine.split("\t");
+                    }
                     synset = "";
                     lemma= "";
                     senseKey = "";
@@ -374,7 +380,7 @@ vn:comprehend-87.2 vn:87.2 vn:null vn:null vn:misinterpret wn:misinterpret%2:31:
                             }
                         }
                     }
-                   // System.out.println("synset = " + synset);
+                    //System.out.println("synset = " + synset);
                     // we get the lemma and the senseKey
                     for (int i = 0; i < fields.length; i++) {
                         String field = fields[i];

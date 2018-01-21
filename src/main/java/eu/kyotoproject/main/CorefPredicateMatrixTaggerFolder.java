@@ -93,7 +93,7 @@ public class CorefPredicateMatrixTaggerFolder {
             String strBeginDate = eu.kyotoproject.util.DateUtil.createTimestamp();
             String strEndDate = null;
             kafSaxParser.parseFile(pathToKafFile);
-            KafPredicateMatrixTagger.processKafFileCorefWordnetNetSynsets(kafSaxParser, pmVersion, resources, selectedMappings);
+            KafPredicateMatrixTagger.processExtendCorefForWordnetNetSynsets(kafSaxParser, pmVersion, resources, selectedMappings);
 
             strEndDate = eu.kyotoproject.util.DateUtil.createTimestamp();
             String host = "";
