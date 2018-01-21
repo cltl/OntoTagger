@@ -310,6 +310,16 @@ public class KafPredicateMatrixTagger {
         }
     }
 
+    static public void processKafFileCorefWordnetNetSynsets (KafSaxParser kafSaxParser, String pmVersion, Resources resources, String[] selectedMappings) {
+        for (int i = 0; i < kafSaxParser.kafCorefenceArrayList.size(); i++) {
+            KafCoreferenceSet kafCoreferenceSet = kafSaxParser.kafCorefenceArrayList.get(i);
+            for (int j = 0; j < kafCoreferenceSet.getExternalReferences().size(); j++) {
+                KafSense kafSense = kafCoreferenceSet.getExternalReferences().get(j);
+                mappSense(resources, kafSense, pmVersion, selectedMappings);
+            }
+        }
+    }
+
 
     static void mappSense (Resources resources, KafSense givenKafSense, String pmVersion, String[] selectedMappings) {
         String senseCode = givenKafSense.getSensecode();
