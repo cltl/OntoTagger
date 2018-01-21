@@ -414,14 +414,16 @@ public class KafPredicateMatrixTagger {
                     String s = mapping.get(k);
                     int idx = s.indexOf(":");
                     String resource = s;
+                    String value = s;
                     if (idx > -1) {
                         resource = s.substring(0, idx);
+                        value = s.substring(idx+1);
                     }
                     if (checkMappings(selectedMappings, resource) && !coveredMappings.contains(resource)) {
                         coveredMappings.add(resource); /// prevent multiple fields that share prefix, take first
                         KafSense child = new KafSense();
                         child.setResource(resource);
-                        child.setSensecode(s);
+                        child.setSensecode(value);
                         concepts.add(child);
                     }
                 }
