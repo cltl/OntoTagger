@@ -281,6 +281,9 @@ public class KafPredicateMatrixTagger {
             if (m.equalsIgnoreCase(selectedMapping)) {
                 return true;
             }
+            else if (m.startsWith(selectedMapping)) {
+                return true;
+            }
         }
         return false;
     }
@@ -349,6 +352,7 @@ public class KafPredicateMatrixTagger {
 
     static void mappSense (Resources resources, KafSense givenKafSense, String pmVersion, String[] selectedMappings) {
         String senseCode = givenKafSense.getSensecode();
+        //System.out.println("senseCode = " + senseCode);
         if (!resources.wordNetPredicateMap.containsKey(givenKafSense.getSensecode())) {
             if (senseCode.startsWith("nld-")) {
                 int idx = senseCode.indexOf("_"); //nld-21-d_v-3939-v
@@ -358,7 +362,7 @@ public class KafPredicateMatrixTagger {
             }
         }
         if (resources.wordNetPredicateMap.containsKey(senseCode)) {
-
+            ArrayList<String> matchedSenseCode = new ArrayList<String>();
             ArrayList<ArrayList<String>> mappings = resources.wordNetPredicateMap.get(senseCode);
             for (int m = 0; m < mappings.size(); m++) {
                 boolean match = false;
@@ -368,8 +372,8 @@ public class KafPredicateMatrixTagger {
                 ArrayList<String> mapping =  mappings.get(m);
                 for (int k = 1; k < mapping.size(); k++) {
                     String s = mapping.get(k);
+                    //System.out.println("s = " + s);
                     if (checkMappings(selectedMappings, s)) {
-                        match = true;
                         int idx = s.indexOf(":");
                         String resource = "";
                         if (idx > -1) {
@@ -378,18 +382,22 @@ public class KafPredicateMatrixTagger {
                         KafSense child = new KafSense();
                         child.setResource(resource);
                         child.setSensecode(s);
-                        mChild.addChildren(child);
+                        if (!matchedSenseCode.contains(s)) {
+                            match = true;
+                            matchedSenseCode.add(s);
+                            mChild.addChildren(child);
+                        }
                     }
                 }
                 if (match) {
-                  //  System.out.println("givenKafSense = " + givenKafSense.getSensecode());
+                   // System.out.println("givenKafSense = " + givenKafSense.getSensecode());
                     givenKafSense.addChildren(mChild);
                 }
             }
 
         }
         else {
-          //  System.out.println("cannot find senseCode = " + senseCode);
+         //   System.out.println("cannot find senseCode = " + senseCode);
         }
     }
 

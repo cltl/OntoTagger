@@ -26,6 +26,8 @@ public class KafPredicateMatrixTaggerFolder {
     static final String layer = "terms";
     static final String name = "vua-predicate-matrix-tagger";
     static final String version = "1.0";
+    static String testparamters1 = "--input-folder /Users/piek/Desktop/NNIP/2005-01-18/S-1/A --extension .xml --mappings fn:;ili;eso --ili --version 1.2 --predicate-matrix /Code/vu/newsreader/vua-resources/PredicateMatrix_withESO.txt.gz --grammatical-words /Code/vu/newsreader/vua-resources/Grammatical-words.en";
+    static String testparamters2 = "--input-folder /Users/piek/Desktop/NNIP/2005-01-18/S-1/A --extension .xml --mappings fn:;ili;eso --ili --version 1.2 --predicate-matrix /Code/vu/newsreader/vua-resources/PredicateMatrix.v1.3.txt.role.odwn.gz --grammatical-words /Code/vu/newsreader/vua-resources/Grammatical-words.en";
 
     static public void main (String[] args) {
         Resources resources = new Resources();
@@ -41,6 +43,8 @@ public class KafPredicateMatrixTaggerFolder {
         String[] selectedMappings = null;
 
         boolean ili = false;
+        if (args.length==0)  args = testparamters2.split(" ");
+
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if ((arg.equalsIgnoreCase("--input-folder")) && (args.length>(i+1))) {
@@ -112,7 +116,7 @@ public class KafPredicateMatrixTaggerFolder {
             LP lp = new LP(name,version, strBeginDate, strBeginDate, strEndDate, host);
             kafSaxParser.getKafMetaData().addLayer(layer, lp);
 
-            String pathToKafFileOut = pathToKafFile+".event.kaf";
+            String pathToKafFileOut = pathToKafFile+".naf";
             try {
                 OutputStream fos = new FileOutputStream(pathToKafFileOut);
                 if (format.equalsIgnoreCase("naf")) {

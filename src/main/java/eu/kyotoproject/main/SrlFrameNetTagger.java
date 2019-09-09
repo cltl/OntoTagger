@@ -38,6 +38,7 @@ public class SrlFrameNetTagger {
     static final String layer = "srl";
     static final String name = "vua-framenet-srl-tagger";
     static final String version = "1.0";
+    static String testparameters = "naf-file /Users/piek/Desktop/NNIP/2005-01-18/S-1/A/item_15_recent_sales_of_unregistered_securities_.utf-8.xml --frame-ns fn: --role-ns fn-role:;pb-role:;fn-pb-role:;eso-role: --ili-ns \"mcr:ili\" --sense-conf 0.05 --frame-conf 30";
 
     static public void main (String[] args) {
         String fns = "";
@@ -59,6 +60,7 @@ public class SrlFrameNetTagger {
         frameThreshold = new Integer(70);
         format = "naf";
 */
+        if (args.length==0) args = testparameters.split(" ");
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if ((arg.equalsIgnoreCase("--kaf-file")) && (args.length>(i+1))) {
