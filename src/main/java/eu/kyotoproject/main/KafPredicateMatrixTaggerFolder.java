@@ -109,7 +109,9 @@ public class KafPredicateMatrixTaggerFolder {
             String strBeginDate = eu.kyotoproject.util.DateUtil.createTimestamp();
             String strEndDate = null;
             kafSaxParser.parseFile(pathToKafFile);
+            if (DEBUG) System.out.println("START PROCESSING");
             KafPredicateMatrixTagger.processKafFileWordnetNetSynsets(kafSaxParser, pmVersion, resources, selectedMappings);
+            if (DEBUG) System.out.println("DONE PROCESSING");
 
             strEndDate = eu.kyotoproject.util.DateUtil.createTimestamp();
             String host = "";
@@ -122,6 +124,8 @@ public class KafPredicateMatrixTaggerFolder {
             kafSaxParser.getKafMetaData().addLayer(layer, lp);
 
             String pathToKafFileOut = pathToKafFile+".naf";
+
+            if (DEBUG) System.out.println("SAVING OUTPUT NAF:"+ pathToKafFileOut);
             try {
                 OutputStream fos = new FileOutputStream(pathToKafFileOut);
                 if (format.equalsIgnoreCase("naf")) {
