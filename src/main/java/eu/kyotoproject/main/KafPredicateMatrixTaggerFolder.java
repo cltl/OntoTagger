@@ -27,7 +27,7 @@ public class KafPredicateMatrixTaggerFolder {
     static final String name = "vua-predicate-matrix-tagger";
     static final String version = "1.0";
     static String testparamters1 = "--input-folder /Users/piek/Desktop/NNIP/2005-01-18/S-1/A --extension .xml --mappings fn:;ili;eso --ili --version 1.3 --predicate-matrix /Code/vu/newsreader/vua-resources/PredicateMatrix_withESO.txt.gz --grammatical-words /Code/vu/newsreader/vua-resources/Grammatical-words.en";
-    static String testparamters2 = "--input-folder /Users/piek/Desktop/NNIP/2005-01-18/S-1/A --extension .xml --mappings fn:;ili;eso --ili --version 1.3 --predicate-matrix /Code/vu/newsreader/vua-resources/PredicateMatrix.v1.3.txt.role.odwn.gz --grammatical-words /Code/vu/newsreader/vua-resources/Grammatical-words.en";
+    static String testparamters2 = "--debug --input-folder /Users/piek/Desktop/NNIP/2005-01-18/S-1/A --extension .xml --mappings fn:;ili;eso --ili --version 1.3 --predicate-matrix /Code/vu/newsreader/vua-resources/PredicateMatrix.v1.3.txt.role.odwn.gz --grammatical-words /Code/vu/newsreader/vua-resources/Grammatical-words.en";
 
     static public void main (String[] args) {
         Resources resources = new Resources();
@@ -102,6 +102,7 @@ public class KafPredicateMatrixTaggerFolder {
         }
         KafSaxParser kafSaxParser = new KafSaxParser();
         ArrayList<String> kafFiles = Util.makeRecursiveFileListAll(pathToKafFolder, fileExtension);
+        if (DEBUG) System.out.println("kafFiles.size() = " + kafFiles.size());
         for (int f = 0; f < kafFiles.size(); f++) {
             String pathToKafFile =  kafFiles.get(f);
             if (DEBUG) System.out.println("pathToKafFile = " + pathToKafFile);
