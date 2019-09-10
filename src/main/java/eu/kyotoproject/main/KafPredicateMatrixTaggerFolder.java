@@ -26,8 +26,8 @@ public class KafPredicateMatrixTaggerFolder {
     static final String layer = "terms";
     static final String name = "vua-predicate-matrix-tagger";
     static final String version = "1.0";
-    static String testparamters1 = "--input-folder /Users/piek/Desktop/NNIP/2005-01-18/S-1/A --extension .xml --mappings fn:;ili;eso --ili --version 1.2 --predicate-matrix /Code/vu/newsreader/vua-resources/PredicateMatrix_withESO.txt.gz --grammatical-words /Code/vu/newsreader/vua-resources/Grammatical-words.en";
-    static String testparamters2 = "--input-folder /Users/piek/Desktop/NNIP/2005-01-18/S-1/A --extension .xml --mappings fn:;ili;eso --ili --version 1.2 --predicate-matrix /Code/vu/newsreader/vua-resources/PredicateMatrix.v1.3.txt.role.odwn.gz --grammatical-words /Code/vu/newsreader/vua-resources/Grammatical-words.en";
+    static String testparamters1 = "--input-folder /Users/piek/Desktop/NNIP/2005-01-18/S-1/A --extension .xml --mappings fn:;ili;eso --ili --version 1.3 --predicate-matrix /Code/vu/newsreader/vua-resources/PredicateMatrix_withESO.txt.gz --grammatical-words /Code/vu/newsreader/vua-resources/Grammatical-words.en";
+    static String testparamters2 = "--input-folder /Users/piek/Desktop/NNIP/2005-01-18/S-1/A --extension .xml --mappings fn:;ili;eso --ili --version 1.3 --predicate-matrix /Code/vu/newsreader/vua-resources/PredicateMatrix.v1.3.txt.role.odwn.gz --grammatical-words /Code/vu/newsreader/vua-resources/Grammatical-words.en";
 
     static public void main (String[] args) {
         Resources resources = new Resources();
@@ -41,7 +41,7 @@ public class KafPredicateMatrixTaggerFolder {
         String prefix = "";
         String format = "naf";
         String[] selectedMappings = null;
-
+        boolean DEBUG = false;
         boolean ili = false;
         if (args.length==0)  args = testparamters2.split(" ");
 
@@ -77,6 +77,9 @@ public class KafPredicateMatrixTaggerFolder {
             else if ((arg.equalsIgnoreCase("--ili"))) {
                 ili = true;
             }
+            else if ((arg.equalsIgnoreCase("--debug"))) {
+                DEBUG = true;
+            }
             else if ((arg.equalsIgnoreCase("--mappings")) && (args.length>(i+1))) {
                 selectedMappings = args[i+1].split(";");
             }
@@ -93,13 +96,15 @@ public class KafPredicateMatrixTaggerFolder {
         if (!pathToGrammaticalVerbsFile.isEmpty()) {
             resources.processGrammaticalWordsFile(pathToGrammaticalVerbsFile);
         }
-        //System.out.println("resources.wordNetPredicateMap.size() = " + resources.wordNetPredicateMap.size());
-        //System.out.println("resources.grammaticalWords.size() = " + resources.grammaticalWords.size());
+        if (DEBUG) {
+            System.out.println("resources.wordNetPredicateMap.size() = " + resources.wordNetPredicateMap.size());
+            System.out.println("resources.grammaticalWords.size() = " + resources.grammaticalWords.size());
+        }
         KafSaxParser kafSaxParser = new KafSaxParser();
         ArrayList<String> kafFiles = Util.makeRecursiveFileListAll(pathToKafFolder, fileExtension);
         for (int f = 0; f < kafFiles.size(); f++) {
             String pathToKafFile =  kafFiles.get(f);
-           // System.out.println("pathToKafFile = " + pathToKafFile);
+            if (DEBUG) System.out.println("pathToKafFile = " + pathToKafFile);
 
             String strBeginDate = eu.kyotoproject.util.DateUtil.createTimestamp();
             String strEndDate = null;
