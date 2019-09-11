@@ -90,9 +90,13 @@ public class KafPredicateMatrixTaggerFolder {
             else if ((arg.equalsIgnoreCase("--mappings")) && (args.length>(i+1))) {
                 selectedMappings = args[i+1].split(";");
             }
-            else if (!pathToFrameNetLex.isEmpty()) {
-                 resources.frameNetLuReader.parseFile(pathToFrameNetLex);
-                 resources.frameNetLuReader.KEEPPOSTAG = true;
+
+            else if ((arg.equalsIgnoreCase("--fn-lexicon")) && (args.length>(i+1))) {
+                pathToFrameNetLex = args[i+1];
+            }
+            else if ((arg.equalsIgnoreCase("--fn-lexicon-pos")) && (args.length>(i+1))) {
+                pathToFrameNetLex = args[i+1];
+                resources.frameNetLuReader.KEEPPOSTAG = true;
             }
         }
         if (!pathToMatrixFile.isEmpty()) {
@@ -107,7 +111,6 @@ public class KafPredicateMatrixTaggerFolder {
 
         if (!pathToFrameNetLex.isEmpty()) {
              resources.frameNetLuReader.parseFile(pathToFrameNetLex);
-
             if (DEBUG) {
                 System.out.println("Lexical units resources.frameNetLuReader = " + resources.frameNetLuReader.lexicalUnitFrameMap.size());
             }

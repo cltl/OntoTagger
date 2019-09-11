@@ -63,6 +63,10 @@ public class KafPredicateMatrixTagger {
             else if ((arg.equalsIgnoreCase("--fn-lexicon")) && (args.length>(i+1))) {
                 pathToFrameNetLex = args[i+1];
             }
+            else if ((arg.equalsIgnoreCase("--fn-lexicon-pos")) && (args.length>(i+1))) {
+                pathToFrameNetLex = args[i+1];
+                resources.frameNetLuReader.KEEPPOSTAG = true;
+            }
             else if ((arg.equalsIgnoreCase("--grammatical-words")) && (args.length>(i+1))) {
                 pathToGrammaticalVerbsFile = args[i+1];
             }
@@ -86,10 +90,12 @@ public class KafPredicateMatrixTagger {
         if (!pathToMatrixFile.isEmpty()) {
             if (ili) {
                 resources.processMatrixFileWithWordnetILI(pathToMatrixFile);
-            } else if (!key.isEmpty()) {
+            }
+            else if (!key.isEmpty()) {
                 resources.processMatrixFile(pathToMatrixFile, key, prefix);
                 // System.out.println("resources = " + resources.wordNetPredicateMap.size());
-            } else {
+            }
+            else {
                 resources.processMatrixFileWithWordnetLemma(pathToMatrixFile);
             }
         }
@@ -97,7 +103,6 @@ public class KafPredicateMatrixTagger {
 
         if (!pathToFrameNetLex.isEmpty()) {
             resources.frameNetLuReader.parseFile(pathToFrameNetLex);
-            resources.frameNetLuReader.KEEPPOSTAG = true;
         }
 
         if (!pathToGrammaticalVerbsFile.isEmpty()) {
