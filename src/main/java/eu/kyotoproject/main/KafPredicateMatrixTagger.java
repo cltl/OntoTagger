@@ -83,19 +83,21 @@ public class KafPredicateMatrixTagger {
                 ili = true;
             }
         }
-        if (ili) {
-            resources.processMatrixFileWithWordnetILI(pathToMatrixFile);
+        if (!pathToMatrixFile.isEmpty()) {
+            if (ili) {
+                resources.processMatrixFileWithWordnetILI(pathToMatrixFile);
+            } else if (!key.isEmpty()) {
+                resources.processMatrixFile(pathToMatrixFile, key, prefix);
+                // System.out.println("resources = " + resources.wordNetPredicateMap.size());
+            } else {
+                resources.processMatrixFileWithWordnetLemma(pathToMatrixFile);
+            }
         }
-        else if (!key.isEmpty()) {
-            resources.processMatrixFile(pathToMatrixFile, key, prefix);
-           // System.out.println("resources = " + resources.wordNetPredicateMap.size());
-        }
-        else if (!pathToFrameNetLex.isEmpty()) {
+
+
+        if (!pathToFrameNetLex.isEmpty()) {
             resources.frameNetLuReader.parseFile(pathToFrameNetLex);
             resources.frameNetLuReader.KEEPPOSTAG = true;
-        }
-        else {
-            resources.processMatrixFileWithWordnetLemma(pathToMatrixFile);
         }
 
         if (!pathToGrammaticalVerbsFile.isEmpty()) {
