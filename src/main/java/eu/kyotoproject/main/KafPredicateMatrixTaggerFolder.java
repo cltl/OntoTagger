@@ -29,6 +29,8 @@ public class KafPredicateMatrixTaggerFolder {
     static String testparamters1 = "--input-folder /Users/piek/Desktop/NNIP/2005-01-18/S-1/A --extension .xml --mappings fn:;ili;eso --ili --version 1.3 --predicate-matrix /Code/vu/newsreader/vua-resources/PredicateMatrix_withESO.txt.gz --grammatical-words /Code/vu/newsreader/vua-resources/Grammatical-words.en";
     static String testparamters2 = "--debug --input-folder /Users/piek/Desktop/NNIP/2005-01-18/S-1/A --extension .xml --mappings fn:;ili;eso --ili --version 1.3 " +
             "--fn-lexicon /Code/vu/kyotoproject/OntoTagger/luIndex.xml --predicate-matrix /Code/vu/newsreader/vua-resources/PredicateMatrix.v1.3.txt.role.odwn.gz --grammatical-words /Code/vu/newsreader/vua-resources/Grammatical-words.en";
+    static String testparamters3 = "--debug --input-folder /Users/piek/Desktop/NNIP/2005-01-18/S-1/A --extension .xml --mappings fn:;ili;eso --ili --version 1.3 " +
+            "--fn-lexicon /Code/vu/kyotoproject/OntoTagger/luIndex.xml --grammatical-words /Code/vu/newsreader/vua-resources/Grammatical-words.en";
 
     static public void main (String[] args) {
         Resources resources = new Resources();
@@ -45,7 +47,7 @@ public class KafPredicateMatrixTaggerFolder {
         String[] selectedMappings = null;
         boolean DEBUG = false;
         boolean ili = false;
-        if (args.length==0)  args = testparamters2.split(" ");
+        if (args.length==0)  args = testparamters3.split(" ");
 
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
@@ -93,14 +95,14 @@ public class KafPredicateMatrixTaggerFolder {
                  resources.frameNetLuReader.KEEPPOSTAG = true;
             }
         }
-        if (ili) {
-            resources.processMatrixFileWithWordnetILI(pathToMatrixFile);
-        }
-        else if (!key.isEmpty()) {
-            resources.processMatrixFile(pathToMatrixFile, key, prefix);
-        }
-        else {
-            resources.processMatrixFileWithWordnetLemma(pathToMatrixFile);
+        if (!pathToMatrixFile.isEmpty()) {
+            if (ili) {
+                resources.processMatrixFileWithWordnetILI(pathToMatrixFile);
+            } else if (!key.isEmpty()) {
+                resources.processMatrixFile(pathToMatrixFile, key, prefix);
+            } else {
+                resources.processMatrixFileWithWordnetLemma(pathToMatrixFile);
+            }
         }
 
         if (!pathToFrameNetLex.isEmpty()) {
