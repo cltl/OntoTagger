@@ -28,7 +28,7 @@ public class FrameNetLuReader extends DefaultHandler {
 
     public HashMap<String, ArrayList<String>> lexicalUnitFrameMap;
     private String value = "";
-
+    public boolean KEEPPOSTAG = false;
 
     public boolean parseFile(InputSource var1) {
         try {
@@ -123,9 +123,11 @@ public class FrameNetLuReader extends DefaultHandler {
                     frame = attributes.getValue(i).trim();
                 } else if (name.equalsIgnoreCase("name")) {
                     word = attributes.getValue(i).trim();
-                    int idx = word.lastIndexOf(".");
-                    if (idx > -1) {
-                        word = word.substring(0, idx);
+                    if (!KEEPPOSTAG) {
+                        int idx = word.lastIndexOf(".");
+                        if (idx > -1) {
+                            word = word.substring(0, idx);
+                        }
                     }
                 }
             }

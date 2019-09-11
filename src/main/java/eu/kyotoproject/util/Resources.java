@@ -23,6 +23,7 @@ public class Resources {
     public HashMap<String, ArrayList<String>> synsetOntologyMap = new HashMap<String, ArrayList<String>>();
     public HashMap<String, ArrayList<String>> ontologyOntologyMap = new HashMap<String, ArrayList<String>>();
     public ArrayList<String> relationArrayList = new ArrayList<String>();
+    public FrameNetLuReader frameNetLuReader = new FrameNetLuReader();
 
     public Resources () {
         wordNetLemmaSenseMap = new HashMap<String,ArrayList<String>>();
@@ -32,6 +33,7 @@ public class Resources {
         synsetOntologyMap = new HashMap<String, ArrayList<String>>();
         ontologyOntologyMap = new HashMap<String, ArrayList<String>>();
         relationArrayList = new ArrayList<String>();
+        frameNetLuReader = new FrameNetLuReader();
     }
 
 
@@ -218,6 +220,9 @@ public class Resources {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
+
+
+
     ///////// PREDICATE MATRIX FUNCTIONS //////////////////////////////
 
     public void processMatrixFileWithWordnetLemma(String file) {

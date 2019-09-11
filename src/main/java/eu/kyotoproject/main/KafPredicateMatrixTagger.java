@@ -36,6 +36,7 @@ public class KafPredicateMatrixTagger {
         //pathToMatrixFile = "/Tools/nwr-dutch-pipeline/vua-ontotagger-v1.0/resources/PredicateMatrix.v1.3.txt.role.odwn";
         String pathToGrammaticalVerbsFile = "";
         //pathToGrammaticalVerbsFile = "/Tools/ontotagger-v1.0/resources/grammaticals/Grammatical-words.nl";
+        String pathToFrameNetLex = "";
         String pmVersion = "";
         pmVersion = "1.1";
         boolean ili = false;
@@ -58,6 +59,9 @@ public class KafPredicateMatrixTagger {
             }
             else if ((arg.equalsIgnoreCase("--predicate-matrix")) && (args.length>(i+1))) {
                 pathToMatrixFile = args[i+1];
+            }
+            else if ((arg.equalsIgnoreCase("--fn-lexicon")) && (args.length>(i+1))) {
+                pathToFrameNetLex = args[i+1];
             }
             else if ((arg.equalsIgnoreCase("--grammatical-words")) && (args.length>(i+1))) {
                 pathToGrammaticalVerbsFile = args[i+1];
@@ -85,6 +89,10 @@ public class KafPredicateMatrixTagger {
         else if (!key.isEmpty()) {
             resources.processMatrixFile(pathToMatrixFile, key, prefix);
            // System.out.println("resources = " + resources.wordNetPredicateMap.size());
+        }
+        else if (!pathToFrameNetLex.isEmpty()) {
+            resources.frameNetLuReader.parseFile(pathToFrameNetLex);
+            resources.frameNetLuReader.KEEPPOSTAG = true;
         }
         else {
             resources.processMatrixFileWithWordnetLemma(pathToMatrixFile);
@@ -297,16 +305,46 @@ public class KafPredicateMatrixTagger {
                 kafTerm.addSenseTag(child);
             }
             else {
+                boolean TAGGED = false;
                 for (int j = 0; j < kafTerm.getSenseTags().size(); j++) {
                     KafSense kafSense = kafTerm.getSenseTags().get(j);
-                    mappSense(resources, kafSense, pmVersion, selectedMappings);
+                    if (!TAGGED) TAGGED = mappSense(resources, kafSense, pmVersion, selectedMappings);
                 }
                 for (int j = 0; j < kafTerm.getComponents().size(); j++) {
                     TermComponent termComponent = kafTerm.getComponents().get(j);
                     for (int k = 0; k < termComponent.getSenseTags().size(); k++) {
                         KafSense kafSense = termComponent.getSenseTags().get(k);
-                        mappSense(resources, kafSense, pmVersion, selectedMappings);
+                        if (!TAGGED) TAGGED = mappSense(resources, kafSense, pmVersion, selectedMappings);
 
+                    }
+                }
+                if (!TAGGED && resources.frameNetLuReader.lexicalUnitFrameMap!=null) {
+                    String lemma = kafTerm.getLemma();
+                    if  (resources.frameNetLuReader.KEEPPOSTAG) {
+                        if (kafTerm.getPos().toLowerCase().startsWith("n")) {
+                            lemma += ".n";
+                        } else if (kafTerm.getPos().toLowerCase().startsWith("v")) {
+                            lemma += ".v";
+                        } else if (kafTerm.getPos().toLowerCase().startsWith("g")) {
+                            lemma += ".a";
+                        }
+                    }
+                    if (resources.frameNetLuReader.lexicalUnitFrameMap.containsKey(lemma)) {
+                        ArrayList<String> frames =  resources.frameNetLuReader.lexicalUnitFrameMap.get(lemma);
+                        //System.out.println("frames = " + frames.toString());
+                        if (frames.size()>0) {
+                            KafSense mChild = new KafSense();
+                            mChild.setResource("fn-lexicon");
+                            mChild.setSensecode(pmVersion);
+                            for (int j = 0; j < frames.size(); j++) {
+                                String frame = frames.get(j);
+                                KafSense child = new KafSense();
+                                child.setResource("FrameNet");
+                                child.setSensecode(frame);
+                                mChild.addChildren(child);
+                            }
+                            kafTerm.addSenseTag(mChild);
+                        }
                     }
                 }
             }
@@ -350,7 +388,8 @@ public class KafPredicateMatrixTagger {
     }
 
 
-    static void mappSense (Resources resources, KafSense givenKafSense, String pmVersion, String[] selectedMappings) {
+    static boolean mappSense (Resources resources, KafSense givenKafSense, String pmVersion, String[] selectedMappings) {
+        boolean TAGGED = false;
         String senseCode = givenKafSense.getSensecode();
         //System.out.println("senseCode = " + senseCode);
         if (!resources.wordNetPredicateMap.containsKey(givenKafSense.getSensecode())) {
@@ -392,6 +431,7 @@ public class KafPredicateMatrixTagger {
                 if (match) {
                    // System.out.println("givenKafSense = " + givenKafSense.getSensecode());
                     givenKafSense.addChildren(mChild);
+                    TAGGED = true;
                 }
             }
 
@@ -399,6 +439,7 @@ public class KafPredicateMatrixTagger {
         else {
          //   System.out.println("cannot find senseCode = " + senseCode);
         }
+        return TAGGED;
     }
 
     static ArrayList<KafSense> addSense (Resources resources, KafSense givenKafSense, String pmVersion, String[] selectedMappings) {

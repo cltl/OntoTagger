@@ -27,13 +27,15 @@ public class KafPredicateMatrixTaggerFolder {
     static final String name = "vua-predicate-matrix-tagger";
     static final String version = "1.0";
     static String testparamters1 = "--input-folder /Users/piek/Desktop/NNIP/2005-01-18/S-1/A --extension .xml --mappings fn:;ili;eso --ili --version 1.3 --predicate-matrix /Code/vu/newsreader/vua-resources/PredicateMatrix_withESO.txt.gz --grammatical-words /Code/vu/newsreader/vua-resources/Grammatical-words.en";
-    static String testparamters2 = "--debug --input-folder /Users/piek/Desktop/NNIP/2005-01-18/S-1/A --extension .xml --mappings fn:;ili;eso --ili --version 1.3 --predicate-matrix /Code/vu/newsreader/vua-resources/PredicateMatrix.v1.3.txt.role.odwn.gz --grammatical-words /Code/vu/newsreader/vua-resources/Grammatical-words.en";
+    static String testparamters2 = "--debug --input-folder /Users/piek/Desktop/NNIP/2005-01-18/S-1/A --extension .xml --mappings fn:;ili;eso --ili --version 1.3 " +
+            "--fn-lexicon /Code/vu/kyotoproject/OntoTagger/luIndex.xml --predicate-matrix /Code/vu/newsreader/vua-resources/PredicateMatrix.v1.3.txt.role.odwn.gz --grammatical-words /Code/vu/newsreader/vua-resources/Grammatical-words.en";
 
     static public void main (String[] args) {
         Resources resources = new Resources();
         String pathToKafFolder = "";
         String fileExtension = "";
         String pathToMatrixFile = "";
+        String pathToFrameNetLex = "";
         String pathToGrammaticalVerbsFile = "";
         String pmVersion = "";
         String key = "";
@@ -59,6 +61,9 @@ public class KafPredicateMatrixTaggerFolder {
             else if ((arg.equalsIgnoreCase("--predicate-matrix")) && (args.length>(i+1))) {
                 pathToMatrixFile = args[i+1];
             }
+            else if ((arg.equalsIgnoreCase("--fn-lexicon")) && (args.length>(i+1))) {
+                pathToFrameNetLex = args[i+1];
+            }
             else if ((arg.equalsIgnoreCase("--version")) && (args.length>(i+1))) {
                 pmVersion = args[i+1];
             }
@@ -83,6 +88,10 @@ public class KafPredicateMatrixTaggerFolder {
             else if ((arg.equalsIgnoreCase("--mappings")) && (args.length>(i+1))) {
                 selectedMappings = args[i+1].split(";");
             }
+            else if (!pathToFrameNetLex.isEmpty()) {
+                 resources.frameNetLuReader.parseFile(pathToFrameNetLex);
+                 resources.frameNetLuReader.KEEPPOSTAG = true;
+            }
         }
         if (ili) {
             resources.processMatrixFileWithWordnetILI(pathToMatrixFile);
@@ -93,6 +102,15 @@ public class KafPredicateMatrixTaggerFolder {
         else {
             resources.processMatrixFileWithWordnetLemma(pathToMatrixFile);
         }
+
+        if (!pathToFrameNetLex.isEmpty()) {
+             resources.frameNetLuReader.parseFile(pathToFrameNetLex);
+
+            if (DEBUG) {
+                System.out.println("Lexical units resources.frameNetLuReader = " + resources.frameNetLuReader.lexicalUnitFrameMap.size());
+            }
+        }
+
         if (!pathToGrammaticalVerbsFile.isEmpty()) {
             resources.processGrammaticalWordsFile(pathToGrammaticalVerbsFile);
         }
