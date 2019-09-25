@@ -36,6 +36,7 @@ public class KafPredicateMatrixTaggerFolder {
         Resources resources = new Resources();
         String pathToKafFolder = "";
         String fileExtension = "";
+        String outTag = "";
         String pathToMatrixFile = "";
         String pathToFrameNetLex = "";
         String pathToGrammaticalVerbsFile = "";
@@ -56,6 +57,9 @@ public class KafPredicateMatrixTaggerFolder {
             }
             else if ((arg.equalsIgnoreCase("--extension")) && (args.length>(i+1))) {
                 fileExtension = args[i+1];
+            }
+            else if ((arg.equalsIgnoreCase("--out-prefix")) && (args.length>(i+1))) {
+                outTag = args[i+1];
             }
             else if ((arg.equalsIgnoreCase("--pos")) && (args.length>(i+1))) {
                 pos = args[i+1];
@@ -148,6 +152,10 @@ public class KafPredicateMatrixTaggerFolder {
             kafSaxParser.getKafMetaData().addLayer(layer, lp);
 
             String pathToKafFileOut = pathToKafFile+".naf";
+            if (!outTag.isEmpty()) {
+                pathToKafFileOut = outTag+pathToKafFile;
+            }
+
 
             if (DEBUG) System.out.println("SAVING OUTPUT NAF:"+ pathToKafFileOut);
             try {
