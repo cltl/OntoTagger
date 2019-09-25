@@ -6,6 +6,7 @@ import eu.kyotoproject.kaf.LP;
 import eu.kyotoproject.util.Resources;
 import eu.kyotoproject.util.Util;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,7 +31,7 @@ public class KafPredicateMatrixTaggerFolder {
     static String testparamters2 = "--debug --input-folder /Users/piek/Desktop/NNIP/2005-01-18/S-1/A --extension .xml --mappings fn:;ili;eso --ili --version 1.3 " +
             "--fn-lexicon /Code/vu/kyotoproject/OntoTagger/luIndex.xml --predicate-matrix /Code/vu/newsreader/vua-resources/PredicateMatrix.v1.3.txt.role.odwn.gz --grammatical-words /Code/vu/newsreader/vua-resources/Grammatical-words.en";
     static String testparamters3 = "--debug --input-folder /Users/piek/Desktop/NNIP/2005-01-18/S-1/A --extension .xml --mappings fn:;ili;eso --ili --version 1.3 " +
-            "--fn-lexicon /Code/vu/kyotoproject/OntoTagger/luIndex.xml --grammatical-words /Code/vu/newsreader/vua-resources/Grammatical-words.en";
+            "--out-prefix onto_ --fn-lexicon /Code/vu/kyotoproject/OntoTagger/luIndex.xml --grammatical-words /Code/vu/newsreader/vua-resources/Grammatical-words.en";
 
     static public void main (String[] args) {
         Resources resources = new Resources();
@@ -151,9 +152,10 @@ public class KafPredicateMatrixTaggerFolder {
             LP lp = new LP(name,version, strBeginDate, strBeginDate, strEndDate, host);
             kafSaxParser.getKafMetaData().addLayer(layer, lp);
 
+            File file = new File(pathToKafFile);
             String pathToKafFileOut = pathToKafFile+".naf";
             if (!outTag.isEmpty()) {
-                pathToKafFileOut = outTag+pathToKafFile;
+                pathToKafFileOut = file.getParentFile().getAbsolutePath()+"/"+outTag+file.getName();
             }
 
 
