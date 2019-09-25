@@ -75,6 +75,7 @@ public class FrameNetLuReader extends DefaultHandler {
 
         return var3;
     }
+
     public void parseFile(String filePath) {
         String myerror = "";
         init();
